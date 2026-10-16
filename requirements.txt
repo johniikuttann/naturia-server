@@ -1,0 +1,2 @@
+# Only needed on Render (Postgres driver). Locally the server runs on Python's built-in SQLite.
+psycopg[binary]==3.2.3

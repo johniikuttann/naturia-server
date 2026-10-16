@@ -1,0 +1,74 @@
+[
+  {
+    "id": "dried-banana-peels-50kg",
+    "name": "Sun-Dried Banana Peels – 50 kg Sack",
+    "regular_price": 2250,
+    "sale_price": 1750
+  },
+  {
+    "id": "dried-citrus-peels-25kg",
+    "name": "Sun-Dried Orange & Citrus Peels – 25 kg Sack",
+    "regular_price": 1250,
+    "sale_price": 999
+  },
+  {
+    "id": "dried-pomegranate-peels-25kg",
+    "name": "Dried Pomegranate Peels – 25 kg Sack",
+    "regular_price": 1100,
+    "sale_price": ""
+  },
+  {
+    "id": "dried-mango-peels-50kg",
+    "name": "Dried Mango Peels – 50 kg Sack (Seasonal)",
+    "regular_price": 1500,
+    "sale_price": 1250
+  },
+  {
+    "id": "dried-watermelon-rind-25kg",
+    "name": "Dried Watermelon Rind Flakes – 25 kg Sack",
+    "regular_price": 900,
+    "sale_price": 750
+  },
+  {
+    "id": "dried-potato-peels-50kg",
+    "name": "Dried Potato Peels – 50 kg Sack",
+    "regular_price": 1400,
+    "sale_price": 1150
+  },
+  {
+    "id": "onion-garlic-skins-25kg",
+    "name": "Dried Onion & Garlic Skins – 25 kg Sack",
+    "regular_price": 1500,
+    "sale_price": 1250
+  },
+  {
+    "id": "dried-mixed-vegetable-waste-50kg",
+    "name": "Dried Mixed Vegetable Waste – 50 kg Sack",
+    "regular_price": 1250,
+    "sale_price": 999
+  },
+  {
+    "id": "crushed-eggshell-powder-25kg",
+    "name": "Crushed Eggshell Powder – 25 kg Sack",
+    "regular_price": 1750,
+    "sale_price": 1499
+  },
+  {
+    "id": "dried-coffee-grounds-25kg",
+    "name": "Dried Coffee Grounds – 25 kg Sack",
+    "regular_price": 1500,
+    "sale_price": 1250
+  },
+  {
+    "id": "coconut-husk-coir-50kg",
+    "name": "Coconut Husk & Coir Fibre – 50 kg Bale",
+    "regular_price": 1200,
+    "sale_price": 950
+  },
+  {
+    "id": "peel-veg-compost-starter-mix-50kg",
+    "name": "Peel & Veg Compost Starter Mix – 50 kg Sack",
+    "regular_price": 2500,
+    "sale_price": 1999
+  }
+]

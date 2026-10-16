@@ -1,0 +1,21 @@
+# Render Blueprint for the Naturia order server.
+# Render → New → Blueprint → pick this repository → Render reads this file.
+services:
+  - type: web
+    name: naturia-orders
+    runtime: python
+    plan: free
+    region: singapore          # closest Render region to Kerala
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true    # Render creates a strong random password; see it under Environment
+      - key: DATABASE_URL
+        sync: false            # Render asks you to paste your Neon connection string

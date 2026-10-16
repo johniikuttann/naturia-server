@@ -1,0 +1,9 @@
+# Local test data — never upload customer orders to GitHub.
+orders.db
+orders.db-*
+orders.json
+orders.json.tmp
+__pycache__/
+*.pyc
+.env
+.env.*
