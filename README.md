@@ -3,6 +3,10 @@
 Receives orders from the Naturia Android app, stores them in a Postgres database (Neon), and
 gives the shop owner a password-protected orders page.
 
+**Live:** https://naturia-orders.onrender.com (orders page: `/admin`). Render service
+`naturia-orders` (free, Singapore), auto-deployed from this repository's `main` branch. Database:
+Neon project `naturia` (Singapore).
+
 ## Endpoints
 
 | URL | What it does | Login |
