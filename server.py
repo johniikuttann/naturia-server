@@ -7,7 +7,11 @@ PC with a local SQLite file for testing.
     python server.py
 
 Environment variables
-    DATABASE_URL     Postgres connection string (Neon). Not set → local SQLite file orders.db
+    DATABASE_URL           Neon *pooled* connection string, used for order traffic.
+                           Not set → local SQLite file orders.db
+    DATABASE_URL_UNPOOLED  Neon *direct* connection string, used only to create the
+                           table (schema changes must not go through the pooler).
+                           Optional: falls back to DATABASE_URL.
     ADMIN_USER       admin login name (default: admin)
     ADMIN_PASSWORD   admin password. Not set → the admin pages are switched off
     PORT             set by Render; locally defaults to 8787
@@ -46,11 +50,35 @@ SQLITE_FILE = os.path.join(HERE, 'orders.db')
 # Local testing only: the app's pages, so the app can also be tried in a browser.
 WWW = os.path.normpath(os.path.join(HERE, '..', 'android-project', 'app', 'src', 'main', 'assets', 'www'))
 
-ON_RENDER = 'PORT' in os.environ
+def load_env_file():
+    """Local runs: read .env.local / .env written by `neon deploy`.
+
+    Real environment variables (Render's settings) always win, and Render has
+    no such file, so this only matters on a developer's PC.
+    """
+    for name in ('.env.local', '.env'):
+        path = os.path.join(HERE, name)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                key, _, value = line.partition('=')
+                key = key.strip().removeprefix('export ').strip()
+                value = value.strip().strip('"').strip("'")
+                os.environ.setdefault(key, value)
+
+
+load_env_file()
+
+ON_RENDER = 'RENDER' in os.environ or 'RENDER_SERVICE_ID' in os.environ
 HOST = '0.0.0.0' if ON_RENDER else '127.0.0.1'
 PORT = int(os.environ.get('PORT', '8787'))
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+DATABASE_URL_UNPOOLED = os.environ.get('DATABASE_URL_UNPOOLED', '').strip()
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin').strip() or 'admin'
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
 
@@ -68,8 +96,9 @@ PIN_RE = re.compile(r'^[1-9]\d{5}$')
 class Database:
     """Same SQL on Postgres (Neon) and SQLite (local); only placeholders differ."""
 
-    def __init__(self, url):
+    def __init__(self, url, direct_url=''):
         self.url = url
+        self.direct_url = direct_url or url
         self.postgres = url.startswith(('postgres://', 'postgresql://'))
         self.lock = threading.Lock()
         if self.postgres:
@@ -77,19 +106,23 @@ class Database:
             self.driver = psycopg
         self._create_table()
 
-    def connect(self):
+    def connect(self, direct=False):
         if self.postgres:
-            return self.driver.connect(self.url, connect_timeout=15)
+            # Order traffic goes through Neon's pooler (PgBouncer, transaction
+            # mode). prepare_threshold=None turns off server-side prepared
+            # statements, which a transaction pooler cannot keep track of.
+            return self.driver.connect(self.direct_url if direct else self.url,
+                                       connect_timeout=15, prepare_threshold=None)
         conn = sqlite3.connect(SQLITE_FILE, timeout=15)
         return conn
 
     def q(self, sql):
         return sql.replace('?', '%s') if self.postgres else sql
 
-    def run(self, sql, params=(), fetch=None):
+    def run(self, sql, params=(), fetch=None, direct=False):
         # SQLite (local file) allows one writer at a time; Postgres handles its own locking.
         with self.lock if not self.postgres else contextlib.nullcontext():
-            conn = self.connect()
+            conn = self.connect(direct)
             try:
                 cur = conn.cursor()
                 cur.execute(self.q(sql), params)
@@ -111,7 +144,7 @@ class Database:
             items TEXT NOT NULL,
             subtotal NUMERIC NOT NULL,
             payment TEXT NOT NULL
-        )''')
+        )''', direct=True)  # schema change: direct connection, not the pooler
 
     # orders --------------------------------------------------------------
     def find_by_request(self, request_id):
@@ -503,7 +536,7 @@ if not os.path.exists(CATALOGUE_FILE):
     raise SystemExit('catalogue.json is missing — run "python build_app.py" in the App folder first.')
 
 CATALOGUE = load_catalogue()
-DB = Database(DATABASE_URL)
+DB = Database(DATABASE_URL, DATABASE_URL_UNPOOLED)
 
 if __name__ == '__main__':
     where = 'Postgres (DATABASE_URL)' if DB.postgres else f'SQLite file {SQLITE_FILE}'

@@ -17,7 +17,8 @@ gives the shop owner a password-protected orders page.
 
 | Name | Meaning |
 |---|---|
-| `DATABASE_URL` | Neon Postgres connection string. Without it the server uses a local file `orders.db` (testing only) |
+| `DATABASE_URL` | Neon **pooled** connection string (host has `-pooler`), used for order traffic. Without it the server uses a local file `orders.db` (testing only) |
+| `DATABASE_URL_UNPOOLED` | Neon **direct** connection string, used only to create the table. Optional |
 | `ADMIN_USER` | Admin login name (default `admin`) |
 | `ADMIN_PASSWORD` | Admin password. Without it the admin pages are switched off |
 | `PORT` | Set automatically by Render |
@@ -34,8 +35,13 @@ paste the Neon connection string for `DATABASE_URL` → **Apply**. Render create
 python server.py
 ```
 
-It needs no extra packages locally. Orders go to `orders.db`, and the server runs at
-http://localhost:8787. Set `ADMIN_PASSWORD` to open http://localhost:8787/admin.
+The server runs at http://localhost:8787 (set `ADMIN_PASSWORD` to open `/admin`).
+
+- **With Neon:** this folder is linked to the Neon project `naturia` (`neon.ts`, `.neon`).
+  `neon deploy` writes `DATABASE_URL` / `DATABASE_URL_UNPOOLED` to `.env.local`, which the server
+  reads automatically. It needs `pip install -r requirements.txt` (psycopg). `.env.local` holds the
+  database password and is never committed.
+- **Without Neon:** no extra packages needed. Orders go to a local `orders.db` file.
 
 ## Updating prices or products
 

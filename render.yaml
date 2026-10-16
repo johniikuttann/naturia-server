@@ -18,4 +18,6 @@ services:
       - key: ADMIN_PASSWORD
         generateValue: true    # Render creates a strong random password; see it under Environment
       - key: DATABASE_URL
-        sync: false            # Render asks you to paste your Neon connection string
+        sync: false            # paste Neon's POOLED connection string (host contains "-pooler")
+      - key: DATABASE_URL_UNPOOLED
+        sync: false            # optional: Neon's DIRECT string (no "-pooler"), used only to create the table

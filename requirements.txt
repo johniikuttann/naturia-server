@@ -1,2 +1,3 @@
-# Only needed on Render (Postgres driver). Locally the server runs on Python's built-in SQLite.
-psycopg[binary]==3.2.3
+# Postgres driver for Neon. Used on Render, and locally whenever .env.local (from `neon deploy`)
+# provides DATABASE_URL; without it the server falls back to Python's built-in SQLite.
+psycopg[binary]==3.3.6
