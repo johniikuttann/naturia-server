@@ -1,5 +1,7 @@
 {
   "latest_version": "2.0.0",
-  "apk_url": "",
-  "notes": ""
+  "apk_url": "https://raw.githubusercontent.com/johniikuttann/naturia-server/main/apk/Naturia.apk",
+  "notes": "Naturia 2.0.0",
+  "sha256": "3bcde8659e90f751b8a58b19e24bf6880e2b34c8d7071c0c243a5e2dddea1ec2",
+  "size_bytes": 1627842
 }

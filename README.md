@@ -100,25 +100,26 @@ and push; Render redeploys and the website changes. **When you change a price, c
 The app shows a green **Update app** button only when `update.json` lists a newer version than
 the one installed. Nothing else needs changing on the server.
 
+The newest APK lives in this repository as `apk/Naturia.apk`. `update.json` says which version it is.
+
 1. In the Android project raise `versionCode` and `versionName` in `app/build.gradle`, and set
    `APP_VERSION` in `assets/js/app-update.js` to the same `versionName`.
 2. Build the APK and sign it with the **same keystore** as before (otherwise phones refuse it).
-3. On GitHub: **Releases → Draft a new release**, tag it (e.g. `v2.1.0`), attach `Naturia.apk`, publish.
-4. Copy the APK's link (right-click the file in the release → copy link) into `update.json`:
+3. Publish it with one command (it checks that the file is an APK, that its version number is the
+   one you typed, and that the version is not older than the last one):
 
-   ```json
-   {
-     "latest_version": "2.1.0",
-     "apk_url": "https://github.com/YOU/REPO/releases/download/v2.1.0/Naturia.apk",
-     "notes": "Short line shown under the button."
-   }
+   ```bash
+   python publish_apk.py C:\path\to\Naturia.apk 2.1.0 "Short line shown under the button"
    ```
-5. Commit and push. Render redeploys in about 2 minutes; the button then appears on phones with an
-   older version. Tapping it downloads the APK; Android asks to install it (the first time, it also
-   asks to allow installs from the browser).
+4. Commit and push (`git add apk update.json`, `git commit -m "App 2.1.0"`, `git push`). Render
+   redeploys in about 2 minutes; the button then appears on phones with an older version. Tapping it
+   downloads the APK; Android asks to install it (the first time, it also asks to allow installs
+   from the browser).
 
-`apk_url` must start with `https://`. If it is empty, or the file is broken, no phone sees a button.
-To switch updates off, set `latest_version` back to the version people already have.
+`https://naturia-orders.onrender.com/download/latest` always gives the newest APK, so it is the link
+to share with new customers. If `apk_url` is empty, or the file is broken, no phone sees a button.
+To switch updates off, set `latest_version` back to the version people already have. Each version
+stays in the git history, so an old one can be brought back.
 
 `client/app-update.js` is the app side. Copy it to the Android project's `assets/js/` and load it
 after `app-fixes.js` on every page. The sign-in files (`www/login.html`, `www/assets/js/auth.js`,
