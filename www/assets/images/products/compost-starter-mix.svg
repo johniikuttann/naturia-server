@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Peel and vegetable compost starter mix">
+<title>Peel and vegetable compost starter mix</title>
+<defs></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+<path d="M135 110h130l18 200H117z" fill="#D7B48A" stroke="#A67C52" stroke-width="4" stroke-linejoin="round"/>
+<path d="M135 110h130l4 34H131z" fill="#C49A6C" stroke="#A67C52" stroke-width="4" stroke-linejoin="round"/>
+<path d="M200 260c-34-4-50-30-44-66 34 4 50 30 44 66z" fill="#58A55C"/>
+<path d="M200 262c-14-20-24-40-30-60" stroke="#2E7D32" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M204 252c22-6 36-24 34-50-22 4-36 24-34 50z" fill="#8DB277"/>
+<path d="M70 318c20-40 60-48 90-30 30-30 80-20 96 6 30-10 64 0 74 24z" fill="#5D4037"/>
+<path d="M120 300l14-6 4 10zM250 298l16-4 0 12zM200 306l12-8 4 12z" fill="#F4D03F"/>
+<path d="M160 312l12-4 2 10zM288 310l10-6 4 10z" fill="#E67E22"/>
+<path d="M226 310l10-2-2 8z" fill="#58D68D"/>
+</svg>

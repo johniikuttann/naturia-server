@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Pomegranate peels">
+<title>Pomegranate peels</title>
+<defs>
+<g id="cup">
+  <path d="M-58 0A58 54 0 0 0 58 0z" fill="#A93226" stroke="#7B241C" stroke-width="3"/>
+  <ellipse cx="0" cy="0" rx="58" ry="16" fill="#F5CBA7" stroke="#7B241C" stroke-width="3"/>
+  <circle cx="-20" cy="-2" r="6" fill="#E74C3C"/><circle cx="6" cy="3" r="6" fill="#E74C3C"/><circle cx="26" cy="-3" r="5" fill="#E74C3C"/>
+  <path d="M-30 22c14 8 44 8 60 0" stroke="#CD6155" stroke-width="4" fill="none" stroke-linecap="round"/>
+</g></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+<use href="#cup" transform="translate(140 250) scale(1)"/><use href="#cup" transform="translate(262 250) scale(1)"/><use href="#cup" transform="translate(200 190) scale(0.9)"/>
+</svg>

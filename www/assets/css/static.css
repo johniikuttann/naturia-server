@@ -1,0 +1,102 @@
+/**
+ * Venu's Digital Arcade - Static Site Additions
+ *
+ * The WordPress site also loaded WooCommerce's own frontend stylesheet, which
+ * supplied a handful of base rules the theme relied on (hidden screen-reader
+ * text, the breadcrumb, tab panels, the review list). Only those base rules
+ * are reproduced here; every design rule still comes from style.css and
+ * main.css, unchanged.
+ */
+
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+/* Breadcrumb (woocommerce_breadcrumb) */
+.woocommerce-breadcrumb {
+  font-size: 0.75rem;
+  color: var(--text-espresso-light);
+  margin: 0 0 1.5rem;
+}
+
+.woocommerce-breadcrumb a {
+  color: var(--text-espresso-muted);
+}
+
+.woocommerce-breadcrumb a:hover {
+  color: var(--color-caramel);
+}
+
+/* Product data tabs */
+.wc-tab[hidden] {
+  display: none !important;
+}
+
+.wc-tabs li a {
+  display: inline-block;
+}
+
+.wc-tab p {
+  margin-bottom: 0.85rem;
+}
+
+.shop_attributes tr {
+  border-bottom: 1px solid var(--border-beige);
+}
+
+.shop_attributes td p {
+  margin: 0;
+}
+
+/* Prices — WooCommerce strikes through the MRP */
+del .woocommerce-Price-amount {
+  text-decoration: line-through;
+}
+
+ins {
+  text-decoration: none;
+}
+
+/* Product meta lines */
+.product_meta > span {
+  display: block;
+}
+
+/* Related products list */
+.related.products ul.products {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Review list */
+.woocommerce-Reviews .star-rating {
+  letter-spacing: 2px;
+}
+
+.woocommerce-Reviews .meta {
+  margin-top: 0.25rem;
+}
+
+.woocommerce-Reviews .required {
+  color: var(--color-danger);
+}
+
+/* Native [hidden] must win over utility display classes. */
+[hidden] {
+  display: none !important;
+}
+
+/* "Sell your waste" section sits under the sticky header like the other anchors. */
+#sell {
+  scroll-margin-top: 7rem;
+}

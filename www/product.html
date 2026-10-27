@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product – Naturia</title>
+    <link rel="profile" href="https://gmpg.org/xfn/11">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
+    <!-- Google Fonts - Playfair Display, Outfit, DM Sans & Plus Jakarta Sans -->
+    <link rel="stylesheet" href="vendor/fonts/fonts.css">
+
+    <!-- Swiper CSS (CDN) -->
+    <link rel="stylesheet" href="vendor/swiper-bundle.min.css">
+
+    <!-- Theme Stylesheets -->
+    <link rel="stylesheet" href="assets/css/style.css?ver=6.0.0">
+    <link rel="stylesheet" href="assets/css/main.css?ver=6.0.0">
+    <link rel="stylesheet" href="assets/css/static.css?ver=6.0.0">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <!-- Tailwind CSS CDN Runtime with Caramel & Beige Config -->
+    <script src="vendor/tailwindcss.js"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    espresso: '#2B1B17',
+                    'espresso-muted': '#5C4A42',
+                    'espresso-light': '#8C786F',
+                    caramel: '#AF6E4D',
+                    'caramel-dark': '#965B3C',
+                    'caramel-gold': '#C68E17',
+                    'caramel-light': '#F7EFE8',
+                    ivory: '#FAFAF8',
+                    'beige-soft': '#F5EFEB',
+                    'beige-accent': '#EADDCA',
+                    'border-beige': '#EBE3DB',
+                },
+                fontFamily: {
+                    heading: ['Playfair Display', 'Outfit', 'Georgia', 'serif'],
+                    body: ['DM Sans', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                },
+                borderRadius: {
+                    'organic': '16px',
+                }
+            }
+        }
+    }
+    </script>
+
+    <!-- Cookie Consent Engine -->
+    <script>
+    window.VDA_CONSENT_CONFIG = {
+        storageKey: 'vda_cookie_consent',
+        version: '1',
+        categories: ['necessary', 'functional', 'analytics', 'marketing']
+    };
+    </script>
+    <script src="assets/js/cookie-consent.js?ver=6.0.0"></script>
+</head>
+<body class="bg-ivory text-espresso antialiased" data-page="product">
+
+<div id="page" class="site min-h-screen flex flex-col">
+
+    <!-- 1. SOFT BEIGE TOP NOTICE & STORE SELECTOR BAR -->
+    <div class="bg-[#F5EFEB] border-b border-[#EBE3DB] text-xs py-2 text-[#2B1B17]">
+        <div class="boutique-container flex justify-between items-center flex-wrap gap-2">
+            <div class="flex items-center gap-3">
+                <span class="bg-[#EADDCA] text-[#2B1B17] font-bold px-2 py-0.5 rounded-full text-[11px] tracking-wide">Zero-Waste Kerala</span>
+                <span class="font-medium text-xs">Welcome to <strong>Naturia</strong> | Bulk dried peels &amp; biodegradables for farms | <span class="text-[#C68E17] font-bold">★ 4.9 Rated</span></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 2. MAIN ELEGANT BOUTIQUE HEADER -->
+    <header class="bg-[#FAFAF8] border-b border-[#EBE3DB] sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-sm">
+        <div class="boutique-container py-3.5">
+            <div class="flex items-center justify-between gap-4 md:gap-8">
+
+                <!-- Stylish Brand Logo -->
+                <a href="index.html" class="flex items-center gap-2.5 flex-shrink-0">
+                    <img src="assets/images/naturia-logo-horizontal.png" alt="Naturia" width="803" height="240" class="h-10 md:h-12 w-auto object-contain">
+                </a>
+
+                <!-- Modern Rounded Search Bar with Caramel Accent -->
+                <div class="flex-1 max-w-xl hidden md:block">
+                    <form role="search" method="get" action="shop.html" class="boutique-search-bar">
+                        <input type="search" name="s" class="boutique-search-input" placeholder="Search dried peels, vegetable waste, compost mixes, bulk sacks..." autocomplete="off">
+                        <button type="submit" class="boutique-search-btn" aria-label="Search">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Minimalist Account and Cart Icons with Caramel Badges -->
+                <div class="flex items-center gap-3 sm:gap-5 flex-shrink-0">
+
+                    <!-- Account Link -->
+                    <a href="#" class="hidden lg:flex items-center gap-2 text-[#5C4A42] hover:text-[#AF6E4D] transition">
+                        <div class="w-9 h-9 rounded-full bg-[#F5EFEB] flex items-center justify-center text-[#5C4A42]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <div class="text-left text-xs">
+                            <span class="text-[#8C786F] block text-[10px]">Welcome</span>
+                            <span class="font-bold text-[#2B1B17]">My Account</span>
+                        </div>
+                    </a>
+
+                    <!-- Cart Trigger Button with Caramel Badge -->
+                    <button class="cart-toggle-btn flex items-center gap-2 bg-[#F5EFEB] hover:bg-[#EADDCA] text-[#2B1B17] px-3.5 py-2 rounded-full font-bold text-xs transition relative shadow-sm" aria-label="Shopping Cart">
+                        <div class="relative">
+                            <svg class="w-5 h-5 text-[#AF6E4D]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <span class="cart-count-badge" style="background: var(--color-caramel); color: #FFF; font-weight: 800; font-size: 0.72rem; padding: 2px 7px; border-radius: 99px; position: absolute; top: -6px; right: -8px;">0</span>
+                        </div>
+                        <span class="hidden md:inline font-extrabold text-xs">Bag</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="mt-3 md:hidden">
+                <form role="search" method="get" action="shop.html" class="boutique-search-bar">
+                    <input type="search" name="s" class="boutique-search-input text-xs" placeholder="Search dried peels, compost, sacks..." autocomplete="off">
+                    <button type="submit" class="boutique-search-btn" aria-label="Search">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </header>
+
+<!--
+    Single product page (single-product.php).
+    product.html?id=<product id from assets/js/data.js>
+-->
+<main id="primary" class="site-main bg-[#FAFAF8] py-8 md:py-14 min-h-[80vh]">
+    <div class="boutique-container">
+
+        <nav class="woocommerce-breadcrumb" aria-label="Breadcrumb" data-vda-breadcrumb><a href="index.html">Home</a></nav>
+
+        <div id="product" data-vda-product-page class="product type-product product-detail-wrapper">
+
+            <!-- Main 2-Column Product Stage -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start mb-14">
+
+                <!-- LEFT COLUMN: Dynamic Product Gallery & Badges -->
+                <div class="product-gallery-column">
+                    <div class="bg-white border border-[#EBE3DB] rounded-2xl p-6 md:p-8 relative shadow-sm overflow-hidden [&_.woocommerce-product-gallery]:relative [&_.woocommerce-product-gallery__image]:flex [&_.woocommerce-product-gallery__image]:items-center [&_.woocommerce-product-gallery__image]:justify-center [&_.woocommerce-product-gallery__wrapper]:w-full [&_img]:max-h-[460px] [&_img]:w-auto [&_img]:mx-auto [&_img]:object-contain [&_.flex-control-thumbs]:flex [&_.flex-control-thumbs]:gap-3 [&_.flex-control-thumbs]:mt-6 [&_.flex-control-thumbs_li]:w-16 [&_.flex-control-thumbs_li]:h-16 [&_.flex-control-thumbs_li]:rounded-lg [&_.flex-control-thumbs_li]:border [&_.flex-control-thumbs_li]:border-[#EBE3DB] [&_.flex-control-thumbs_li]:overflow-hidden [&_.flex-control-thumbs_img]:w-full [&_.flex-control-thumbs_img]:h-full [&_.flex-control-thumbs_img]:object-contain">
+
+                        <!-- Sale & Natural Pill Badges -->
+                        <div class="flex items-center gap-2 absolute top-4 left-4 z-10" data-vda-p-badges></div>
+
+                        <div data-vda-p-gallery></div>
+                    </div>
+
+                    <!-- Kerala Boutique Value Assurance Strip -->
+                    <div class="grid grid-cols-2 gap-3 mt-4 text-center">
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-3 shadow-sm">
+                            <span class="text-[#AF6E4D] font-bold text-sm block mb-0.5">🚚 Kerala Delivery</span>
+                            <span class="text-[11px] text-[#5C4A42]">24-48 Hr Local Delivery</span>
+                        </div>
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-3 shadow-sm">
+                            <span class="text-[#AF6E4D] font-bold text-sm block mb-0.5">🌱 Garden Ready</span>
+                            <span class="text-[11px] text-[#5C4A42]">Sorted &amp; Plastic-Free</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Product Details, Pricing & Action Buttons -->
+                <div class="product-info-column flex flex-col">
+
+                    <!-- Category Breadcrumb / Brand Tag -->
+                    <div class="text-xs font-bold text-[#AF6E4D] uppercase tracking-widest mb-2" data-vda-p-cats></div>
+
+                    <!-- Product Title -->
+                    <h1 class="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-[#2B1B17] leading-tight mb-3" data-vda-p-title></h1>
+
+                    <!-- Ratings & Review Summary -->
+                    <div class="flex flex-wrap items-center gap-3 mb-4 text-xs font-medium">
+                        <div class="contents" data-vda-p-rating></div>
+                        <span class="text-[#EBE3DB]">|</span>
+                        <span class="text-[#1A994A] font-bold">In Stock</span>
+                    </div>
+
+                    <!-- Price Section (Rich Caramel & Strikethrough MRP) -->
+                    <div class="bg-white border border-[#EBE3DB] rounded-2xl p-5 mb-6 shadow-sm">
+                        <div class="text-xs text-[#8C786F] uppercase tracking-wider mb-1 font-semibold">Special Offer Price:</div>
+                        <div class="font-heading text-3xl sm:text-4xl font-bold text-[#AF6E4D] flex items-baseline gap-3 flex-wrap [&_.woocommerce-Price-currencySymbol]:text-xl [&_del]:text-lg [&_del]:text-[#8C786F] [&_del]:font-normal [&_ins]:no-underline [&_ins]:font-bold" data-vda-p-price></div>
+                        <div class="text-[11px] text-[#5C4A42] mt-2 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-[#1A994A]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                            <span>Inclusive of all taxes + 100% natural, hand-sorted &amp; plastic-free</span>
+                        </div>
+                    </div>
+
+                    <!-- Short Description / Key Highlights -->
+                    <div class="text-sm text-[#5C4A42] leading-relaxed mb-6 border-b border-[#EBE3DB] pb-6" data-vda-p-short></div>
+
+                    <!-- CUSTOM ACTION BUTTONS (Add to Bag & Buy Now) -->
+                    <div class="product-actions-block mb-8">
+
+                        <!-- Add to Bag form (styled in assets/css/main.css) -->
+                        <div id="vda-add-to-cart-form" class="woocommerce-add-to-cart-wrapper mb-3"></div>
+                    </div>
+
+                    <!-- Product SKU & Meta Information -->
+                    <div class="product_meta text-xs text-[#8C786F] space-y-1.5 border-t border-[#EBE3DB] pt-4 [&_a]:text-[#AF6E4D] [&_a:hover]:underline" data-vda-p-meta></div>
+
+                </div>
+
+            </div>
+
+            <!-- BOTTOM SECTION: Product Tabs (Description, Specs, Reviews) & Related Products -->
+            <div class="product-bottom-section border-t border-[#EBE3DB] pt-12">
+
+                <!-- Product Data Tabs -->
+                <div class="bg-white border border-[#EBE3DB] rounded-2xl p-6 md:p-10 mb-12 shadow-sm [&_.wc-tabs]:flex [&_.wc-tabs]:gap-6 [&_.wc-tabs]:border-b [&_.wc-tabs]:border-[#EBE3DB] [&_.wc-tabs]:pb-4 [&_.wc-tabs]:mb-6 [&_.wc-tabs_li]:list-none [&_.wc-tabs_li_a]:font-heading [&_.wc-tabs_li_a]:font-bold [&_.wc-tabs_li_a]:text-base [&_.wc-tabs_li_a]:text-[#5C4A42] [&_.wc-tabs_li.active_a]:text-[#AF6E4D] [&_.wc-tabs_li.active_a]:border-b-2 [&_.wc-tabs_li.active_a]:border-[#AF6E4D] [&_.wc-tabs_li.active_a]:pb-4 [&_.wc-tab]:text-sm [&_.wc-tab]:text-[#5C4A42] [&_.wc-tab]:leading-relaxed [&_.wc-tab_h2]:font-heading [&_.wc-tab_h2]:text-xl [&_.wc-tab_h2]:font-bold [&_.wc-tab_h2]:text-[#2B1B17] [&_.wc-tab_h2]:mb-4 [&_.shop_attributes]:w-full [&_.shop_attributes_th]:py-2.5 [&_.shop_attributes_th]:text-left [&_.shop_attributes_th]:text-xs [&_.shop_attributes_th]:font-bold [&_.shop_attributes_th]:text-[#2B1B17] [&_.shop_attributes_td]:py-2.5 [&_.shop_attributes_td]:text-xs [&_.shop_attributes_td]:text-[#5C4A42]" data-vda-p-tabs></div>
+
+                <!-- CUSTOMER REVIEWS & COMMENTS -->
+                <section id="vda-reviews" class="bg-white border border-[#EBE3DB] rounded-2xl p-6 md:p-10 mb-12 shadow-sm">
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 mb-6 border-b border-[#EBE3DB]">
+                        <div>
+                            <span class="text-xs font-bold text-[#AF6E4D] uppercase tracking-widest block mb-1">Customer Feedback</span>
+                            <h2 class="font-heading text-xl md:text-2xl font-bold text-[#2B1B17]">Reviews &amp; Comments</h2>
+                        </div>
+                        <div data-vda-p-reviews-rating></div>
+                    </div>
+
+                    <div class="vda-reviews-body" data-vda-p-reviews></div>
+
+                </section>
+
+                <!-- Related Products Grid -->
+                <div class="related-products-wrapper [&_.related.products>h2]:font-heading [&_.related.products>h2]:text-2xl [&_.related.products>h2]:font-bold [&_.related.products>h2]:text-[#2B1B17] [&_.related.products>h2]:mb-6 [&_.products]:grid [&_.products]:grid-cols-1 [&_.products]:sm:grid-cols-2 [&_.products]:lg:grid-cols-4 [&_.products]:gap-6 [&_.product]:bg-white [&_.product]:border [&_.product]:border-[#EBE3DB] [&_.product]:rounded-2xl [&_.product]:p-5 [&_.product]:hover:bg-[#FAF7F2] [&_.product]:transition-all [&_.woocommerce-loop-product__title]:font-body [&_.woocommerce-loop-product__title]:text-sm [&_.woocommerce-loop-product__title]:font-bold [&_.woocommerce-loop-product__title]:text-[#2B1B17] [&_.woocommerce-loop-product__title]:mt-3 [&_.price]:font-heading [&_.price]:font-bold [&_.price]:text-base [&_.price]:text-[#AF6E4D] [&_.button]:bg-[#AF6E4D] [&_.button]:hover:bg-[#965B3C] [&_.button]:text-white [&_.button]:font-bold [&_.button]:text-xs [&_.button]:py-2.5 [&_.button]:px-4 [&_.button]:rounded-full [&_.button]:inline-block [&_.button]:mt-3" data-vda-p-related></div>
+
+            </div>
+
+        </div>
+
+        <!-- Product not found -->
+        <div class="bg-white border border-[#EBE3DB] rounded-2xl p-12 text-center max-w-lg mx-auto shadow-sm" data-vda-product-missing hidden>
+            <div class="w-16 h-16 rounded-full bg-[#F5EFEB] text-[#AF6E4D] flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <h2 class="font-heading font-bold text-xl text-[#2B1B17] mb-2">Nothing Found</h2>
+            <p class="text-xs text-[#5C4A42] leading-relaxed mb-6">
+                We could not find what you were looking for. Try a different search, or browse our curated catalogue.
+            </p>
+            <a href="shop.html" class="inline-flex items-center gap-2 bg-[#AF6E4D] hover:bg-[#965B3C] text-white text-xs font-bold px-6 py-3 rounded-full transition shadow-sm">
+                <span>Browse the Catalogue</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+        </div>
+
+    </div>
+</main>
+
+    <!-- SOPHISTICATED DEEP ESPRESSO & SOFT BEIGE FOOTER -->
+    <footer class="bg-[#2B1B17] text-[#EADDCA] text-xs pt-12 pb-16 md:pb-10 border-t border-[#3E2723] mt-auto">
+        <div class="boutique-container">
+
+            <!-- 4-Column Directory Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-10 border-b border-[#3E2723]">
+
+                <!-- Column 1: Brand Info -->
+                <div>
+                    <div class="flex items-center gap-2.5 mb-3.5">
+                        <div class="bg-[#FAFAF8] rounded-xl px-3 py-2">
+                            <img src="assets/images/naturia-logo.png" alt="Naturia — Sustainable Commerce Verified" width="590" height="590" class="h-20 w-auto object-contain">
+                        </div>
+                    </div>
+
+                    <p class="text-[#EBE3DB]/80 leading-relaxed mb-4 text-xs">
+                        Naturia supplies sun-dried fruit &amp; vegetable peels and biodegradable waste in bulk 25 kg and 50 kg sacks — for farms, nurseries, compost makers and gardeners across Kerala.
+                    </p>
+                </div>
+
+                <!-- Column 2: Quick Links / Collections -->
+                <div>
+                    <h4 class="font-bold text-sm text-white uppercase tracking-wider mb-4 border-l-2 border-[#AF6E4D] pl-2.5">Collections</h4>
+                    <ul class="space-y-2.5 text-[#EBE3DB]/80" data-vda-footer-cats>
+                        <li><a href="shop.html" class="hover:text-white transition">Browse the Full Catalog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Customer Policies -->
+                <div>
+                    <h4 class="font-bold text-sm text-white uppercase tracking-wider mb-4 border-l-2 border-[#AF6E4D] pl-2.5">Customer Care</h4>
+                    <ul class="space-y-2.5 text-[#EBE3DB]/80">
+                        <li><a href="return-refund-policy.html" class="hover:text-white transition">Easy Returns & Replacements</a></li>
+                        <li><a href="shipping-delivery-policy.html" class="hover:text-white transition">Delivery &amp; Pickup Terms</a></li>
+                        <li><a href="contact-us.html" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="privacy-policy.html" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html" class="hover:text-white transition">Terms & Conditions</a></li>
+                        <li><a href="cookie-policy.html" class="hover:text-white transition">Cookie Policy</a></li>
+                        <li><a href="pricing-disclaimer.html" class="hover:text-white transition">Pricing & Product Info</a></li>
+                        <li><a href="disclaimer.html" class="hover:text-white transition">Disclaimer</a></li>
+                        <li><a href="#" data-vda-consent-action="open-preferences" class="hover:text-white transition">Cookie Preferences</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Muted Payment Badges & Legal Notice -->
+            <div class="pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[#EADDCA]/70 text-[11px]">
+                <div>
+                    © <span data-vda-year>2026</span> <strong>Naturia</strong>. All Rights Reserved. Sustainable Commerce, Verified.
+                </div>
+
+                <!-- Muted Payment Partner Badges -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[#EADDCA]/50 font-bold mr-1">Payment Gateways:</span>
+                    <span class="bg-[#3E2723] border border-[#5C4A42]/50 px-2.5 py-1 rounded-md text-[#EADDCA] font-medium">Razorpay UPI</span>
+                    <span class="bg-[#3E2723] border border-[#5C4A42]/50 px-2.5 py-1 rounded-md text-[#EADDCA] font-medium">GPay / PhonePe</span>
+                    <span class="bg-[#3E2723] border border-[#5C4A42]/50 px-2.5 py-1 rounded-md text-[#EADDCA] font-medium">Visa & Mastercard</span>
+                    <span class="bg-[#3E2723] border border-[#5C4A42]/50 px-2.5 py-1 rounded-md text-[#EADDCA] font-medium">RuPay</span>
+                    <span class="bg-[#3E2723] border border-[#5C4A42]/50 px-2.5 py-1 rounded-md text-[#C68E17] font-bold">Cash On Delivery</span>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- MOBILE STICKY BOTTOM NAVIGATION BAR (Soft Beige Theme) -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span>Home</span>
+        </a>
+
+        <a href="index.html#categories" class="mobile-nav-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span>Categories</span>
+        </a>
+
+        <a href="index.html#curated" class="mobile-nav-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+            <span>Curated</span>
+        </a>
+
+        <button class="mobile-nav-btn cart-toggle-btn">
+            <div class="relative">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                <span class="mobile-badge mobile-cart-badge">0</span>
+            </div>
+            <span>Bag</span>
+        </button>
+    </div>
+
+    <!-- OFF-CANVAS MINI-CART DRAWER (Warm Ivory & Caramel Theme) -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+    <div class="ld-module-cart-offcanvas" id="ld-module-cart-offcanvas">
+        <!-- Drawer header: bag mark, title, live item count, close -->
+        <div class="vda-cart-header">
+            <div class="vda-cart-header-left">
+                <svg class="vda-cart-header-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18l-1.5 13.5a2 2 0 01-2 1.8H6.5a2 2 0 01-2-1.8L3 6z"></path><path d="M8.5 9.5a3.5 3.5 0 007 0"></path></svg>
+                <h3 class="vda-cart-header-title">Your Cart</h3>
+                <span class="vda-cart-header-count cart-count-badge">0</span>
+            </div>
+            <button id="cart-drawer-close" class="vda-cart-close" aria-label="Close cart">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div class="vda-cart-body">
+            <!-- Reassurance strip -->
+            <div class="vda-cart-assurance">
+                <span class="vda-cart-assurance-item">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12l2 2 4-4"></path><path d="M12 3l7.5 3.5v5c0 4.5-3 8-7.5 9.5-4.5-1.5-7.5-5-7.5-9.5v-5L12 3z"></path></svg>
+                    100% Natural
+                </span>
+                <span class="vda-cart-assurance-item">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"></path></svg>
+                    Plastic-Free
+                </span>
+                <span class="vda-cart-assurance-item">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11V8a7 7 0 0114 0v3"></path><rect x="4" y="11" width="16" height="10" rx="2"></rect></svg>
+                    Hand-Sorted
+                </span>
+            </div>
+
+            <!-- Cart Items List (rendered by assets/js/site.js) -->
+            <div id="cart-drawer-items-list"></div>
+        </div>
+
+        <div class="vda-cart-footer">
+            <div class="vda-cart-subtotal-row">
+                <span class="vda-cart-subtotal-label">Subtotal</span>
+                <span class="vda-cart-subtotal-value" id="cart-drawer-subtotal">&#8377;0</span>
+            </div>
+
+            <p class="vda-cart-tax-note">Cash on Delivery. Add your delivery details on the next step.</p>
+
+            <a href="cart.html#vda-order" data-vda-place-order class="vda-checkout-btn">
+                <span>Place Order</span>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            </a>
+
+            <a href="cart.html" class="vda-view-cart-link">
+                View Shopping Bag
+            </a>
+        </div>
+    </div>
+
+</div><!-- #page -->
+
+    <!-- COOKIE CONSENT BANNER -->
+    <div id="vda-cookie-banner"
+         class="fixed inset-x-0 bottom-0 z-[9999] hidden p-3 sm:p-4"
+         role="region"
+         aria-label="Cookie consent"
+         hidden>
+        <div class="boutique-container">
+            <div class="bg-[#FAFAF8] border border-[#EBE3DB] rounded-2xl shadow-[0_16px_32px_-4px_rgba(43,27,23,0.09)] p-5 sm:p-6 max-w-4xl mx-auto">
+                <h2 class="font-heading text-base sm:text-lg font-bold text-[#2B1B17] mb-1.5">
+                    We use cookies
+                </h2>
+                <p class="text-xs text-[#5C4A42] leading-relaxed mb-4">
+                    Some cookies are needed to run your bag and checkout. Others are optional and stay off unless you turn them on. You can change your mind at any time.
+                    <a href="cookie-policy.html" class="text-[#AF6E4D] font-bold underline underline-offset-2 hover:text-[#965B3C]">Cookie Policy</a>
+                    <span aria-hidden="true">&middot;</span>
+                    <a href="privacy-policy.html" class="text-[#AF6E4D] font-bold underline underline-offset-2 hover:text-[#965B3C]">Privacy Policy</a>
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    <button type="button" data-vda-consent-action="accept-all" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-[#AF6E4D] hover:bg-[#965B3C] text-white border-2 border-[#AF6E4D]">
+                        Accept all
+                    </button>
+                    <button type="button" data-vda-consent-action="reject-all" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-white hover:bg-[#F5EFEB] text-[#2B1B17] border-2 border-[#2B1B17]">
+                        Reject all
+                    </button>
+                    <button type="button" data-vda-consent-action="open-preferences" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-transparent hover:bg-[#F5EFEB] text-[#5C4A42] border-2 border-transparent underline underline-offset-2">
+                        Customise
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COOKIE PREFERENCE CENTRE -->
+    <div id="vda-cookie-preferences" class="fixed inset-0 z-[10000] hidden" hidden>
+        <div class="absolute inset-0 bg-[#2B1B17]/50" data-vda-consent-action="close-preferences"></div>
+
+        <div class="relative min-h-full flex items-end sm:items-center justify-center p-3 sm:p-6">
+            <div class="bg-[#FAFAF8] border border-[#EBE3DB] rounded-2xl shadow-[0_16px_32px_-4px_rgba(43,27,23,0.09)] w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="vda-consent-title">
+
+                <div class="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-[#EBE3DB] bg-[#F5EFEB] rounded-t-2xl sticky top-0">
+                    <div>
+                        <h2 id="vda-consent-title" class="font-heading text-lg font-bold text-[#2B1B17]">
+                            Cookie Preferences
+                        </h2>
+                        <p class="text-xs text-[#5C4A42] mt-1">
+                            Choose what you are comfortable with. Nothing optional is on by default.
+                        </p>
+                    </div>
+                    <button type="button"
+                            data-vda-consent-action="close-preferences"
+                            class="text-[#5C4A42] hover:text-[#2B1B17] p-1 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D]"
+                            aria-label="Close cookie preferences">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-3">
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-4">
+                            <label class="flex items-start gap-3 ">
+                                <input type="checkbox"
+                                       data-vda-consent-category="necessary"
+                                       class="mt-0.5 w-4 h-4 accent-[#AF6E4D] flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D]"
+                                       checked disabled>
+                                <span>
+                                    <span class="block text-sm font-bold text-[#2B1B17]">
+                                        Strictly necessary
+                                        <span class="ml-1 text-[10px] font-bold uppercase tracking-wider text-[#AF6E4D]">Always on</span>
+                                    </span>
+                                    <span class="block text-xs text-[#5C4A42] leading-relaxed mt-1">
+                                        Required for the site to work — your bag, checkout, sign-in and security. These cannot be switched off.
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-4">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox"
+                                       data-vda-consent-category="functional"
+                                       class="mt-0.5 w-4 h-4 accent-[#AF6E4D] flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D]"
+                                       >
+                                <span>
+                                    <span class="block text-sm font-bold text-[#2B1B17]">
+                                        Functional
+                                    </span>
+                                    <span class="block text-xs text-[#5C4A42] leading-relaxed mt-1">
+                                        Remembers your preferences, so the app does not forget them between visits.
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-4">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox"
+                                       data-vda-consent-category="analytics"
+                                       class="mt-0.5 w-4 h-4 accent-[#AF6E4D] flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D]"
+                                       >
+                                <span>
+                                    <span class="block text-sm font-bold text-[#2B1B17]">
+                                        Analytics
+                                    </span>
+                                    <span class="block text-xs text-[#5C4A42] leading-relaxed mt-1">
+                                        Helps us understand which pages and products are used, so we can improve them. Never used to identify you personally.
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="bg-white border border-[#EBE3DB] rounded-xl p-4">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox"
+                                       data-vda-consent-category="marketing"
+                                       class="mt-0.5 w-4 h-4 accent-[#AF6E4D] flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D]"
+                                       >
+                                <span>
+                                    <span class="block text-sm font-bold text-[#2B1B17]">
+                                        Marketing
+                                    </span>
+                                    <span class="block text-xs text-[#5C4A42] leading-relaxed mt-1">
+                                        Used to measure advertising and show you offers that are relevant. Switched off unless you allow it.
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+
+                    <p class="text-xs text-[#8C786F] leading-relaxed pt-1">
+                        Full detail of every cookie we set is in our
+                        <a href="cookie-policy.html" class="text-[#AF6E4D] font-bold underline underline-offset-2 hover:text-[#965B3C]">Cookie Policy</a>.
+                    </p>
+                </div>
+
+                <div class="p-5 sm:p-6 border-t border-[#EBE3DB] bg-[#F5EFEB] rounded-b-2xl flex flex-col sm:flex-row gap-2.5">
+                    <button type="button" data-vda-consent-action="save" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-[#AF6E4D] hover:bg-[#965B3C] text-white border-2 border-[#AF6E4D]">
+                        Save my choices
+                    </button>
+                    <button type="button" data-vda-consent-action="accept-all" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-white hover:bg-[#F5EFEB] text-[#2B1B17] border-2 border-[#2B1B17]">
+                        Accept all
+                    </button>
+                    <button type="button" data-vda-consent-action="reject-all" class="flex-1 sm:flex-initial text-center text-xs font-bold px-6 py-3 rounded-full transition-all shadow-sm cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AF6E4D] bg-white hover:bg-[#F5EFEB] text-[#2B1B17] border-2 border-[#2B1B17]">
+                        Reject all
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Swiper JS (CDN) -->
+<script src="vendor/swiper-bundle.min.js"></script>
+<!-- Store data, static engine, theme main JS -->
+<script src="assets/js/data.js?ver=6.0.0"></script>
+<script src="assets/js/site.js?ver=6.0.0"></script>
+<script src="assets/js/main.js?ver=6.0.0"></script>
+<script src="assets/js/app-order.js"></script>
+<script src="assets/js/app-fixes.js"></script>
+<script src="assets/js/app-update.js"></script>
+</body>
+</html>

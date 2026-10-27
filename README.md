@@ -1,7 +1,8 @@
 # Naturia — order server
 
-Receives orders from the Naturia Android app, stores them in a Postgres database (Neon), and
-gives the shop owner a password-protected orders page.
+Receives orders from the Naturia Android app **and the Naturia website**, stores them in a
+Postgres database (Neon), and gives the shop owner a password-protected orders page. Orders from
+the app and the website land in the same list.
 
 **Live:** https://naturia-orders.onrender.com (orders page: `/admin`). Render service
 `naturia-orders` (free, Singapore), auto-deployed from this repository's `main` branch. Database:
@@ -11,7 +12,8 @@ Neon project `naturia` (Singapore).
 
 | URL | What it does | Login |
 |---|---|---|
-| `POST /api/orders` | The app sends orders here | — |
+| `GET /` and the other pages | The Naturia website, served from the `www/` folder. Ordering there uses the same `/api/orders` | — |
+| `POST /api/orders` | The app and the website send orders here | — |
 | `GET /api/health` | "Is the server up?" (also wakes it on Render's free plan) | — |
 | `GET /admin` | Orders page: change status, call customers | admin |
 | `GET /admin/orders.csv` | Download every order as a spreadsheet | admin |
@@ -48,6 +50,12 @@ The server runs at http://localhost:8787 (set `ADMIN_PASSWORD` to open `/admin`)
   reads automatically. It needs `pip install -r requirements.txt` (psycopg). `.env.local` holds the
   database password and is never committed.
 - **Without Neon:** no extra packages needed. Orders go to a local `orders.db` file.
+
+## The website (`www/`)
+
+`www/` holds the same pages as the app. Edit a page or `www/assets/js/data.js` (products), commit
+and push; Render redeploys and the website changes. **When you change a price, change
+`catalogue.json` too**: the website shows `data.js`, but the server charges `catalogue.json`.
 
 ## Publishing an app update
 

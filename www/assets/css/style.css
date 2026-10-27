@@ -1,0 +1,565 @@
+/*
+Theme Name: Venu's Digital Arcade
+Theme URI: https://venusdigitalarcade.com
+Author: Venu's Digital Arcade Architectural Team
+Author URI: https://venusdigitalarcade.com
+Description: A modern, stylish, and warm boutique WordPress & WooCommerce theme engineered for Venu's Digital Arcade — Kerala's premier home electronics, Smart TVs, and mobile retail chain. Featuring a luxurious Caramel & Beige aesthetic, fast performance, and conversion-optimized UX.
+Version: 4.0.6
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: venus-digital-arcade
+Tags: e-commerce, boutique, caramel, beige, electronics, modern, stylish, woocommerce, tailwindcss
+
+--------------------------------------------------------------
+  MODERN CARAMEL & BEIGE DESIGN SYSTEM & TOKENS
+-------------------------------------------------------------- */
+
+:root {
+  /* Warm Boutique Color Palette */
+  --bg-ivory: #FAFAF8;              /* Warm Off-White Main Canvas */
+  --bg-beige-soft: #F5EFEB;         /* Soft Cream Beige for Section Dividers */
+  --bg-beige-card: #FFFFFF;         /* Crisp White Card Surface */
+  --bg-beige-card-hover: #FAF7F2;   /* Warm Tint Card Hover */
+  --bg-beige-accent: #EADDCA;       /* Soft Sand Beige */
+
+  --color-caramel: #AF6E4D;          /* Rich Warm Caramel Primary */
+  --color-caramel-hover: #965B3C;    /* Deep Caramel Active */
+  --color-caramel-gold: #C68E17;     /* Honey Amber Gold */
+  --color-caramel-light: #F7EFE8;    /* Ultra-light Caramel Wash */
+
+  --text-espresso: #2B1B17;          /* Deep Espresso / Mocha for Headings */
+  --text-espresso-muted: #5C4A42;    /* Medium Mocha for Body Text */
+  --text-espresso-light: #8C786F;    /* Soft Muted Espresso for Subtitles */
+  --text-on-dark: #FDFBF7;           /* Warm Ivory for Dark Backgrounds */
+
+  --border-beige: #EBE3DB;          /* Subtle Warm Beige Border */
+  --border-caramel: #DFBA9E;        /* Warm Caramel Focus Border */
+
+  --color-danger: #C0392B;          /* Destructive actions (remove from cart) */
+
+  /* Typography Stack */
+  --font-heading: 'Playfair Display', 'Outfit', Georgia, serif;
+  --font-body: 'DM Sans', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Warm Tinted Soft Shadows (No harsh black shadows) */
+  --shadow-warm-subtle: 0 2px 6px rgba(43, 27, 23, 0.04);
+  --shadow-warm-card: 0 6px 16px -2px rgba(43, 27, 23, 0.05), 0 2px 6px -1px rgba(43, 27, 23, 0.03);
+  --shadow-warm-hover: 0 16px 32px -4px rgba(43, 27, 23, 0.09), 0 6px 14px -2px rgba(175, 110, 77, 0.12);
+  --shadow-warm-drawer: -8px 0 30px rgba(43, 27, 23, 0.12);
+
+  /* Organic Radii & Fluid Transitions */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-body);
+  background-color: var(--bg-ivory);
+  color: var(--text-espresso);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.6;
+  background-color: var(--bg-ivory);
+  padding-bottom: 64px; /* Space for mobile sticky bottom bar */
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-espresso);
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Layout Container */
+.boutique-container {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .boutique-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Navigation Caramel Underline Link Effect */
+.nav-caramel-link {
+  position: relative;
+  padding: 0.5rem 0;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-espresso-muted);
+  transition: color var(--transition-fast);
+}
+
+.nav-caramel-link:hover,
+.nav-caramel-link.active {
+  color: var(--color-caramel);
+}
+
+.nav-caramel-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--color-caramel);
+  transition: width var(--transition-smooth);
+  border-radius: 2px;
+}
+
+.nav-caramel-link:hover::after,
+.nav-caramel-link.active::after {
+  width: 100%;
+}
+
+/* Boutique Search Bar */
+.boutique-search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-beige);
+  border-radius: var(--radius-full);
+  padding: 3px 4px 3px 1.25rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-warm-subtle);
+  width: 100%;
+}
+
+.boutique-search-bar:focus-within {
+  border-color: var(--color-caramel);
+  box-shadow: 0 0 0 3px rgba(175, 110, 77, 0.12);
+}
+
+.boutique-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--text-espresso);
+  font-family: var(--font-body);
+}
+
+.boutique-search-input::placeholder {
+  color: var(--text-espresso-light);
+}
+
+.boutique-search-btn {
+  background: var(--color-caramel);
+  color: #FFFFFF;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.boutique-search-btn:hover {
+  background: var(--color-caramel-hover);
+  transform: scale(1.05);
+}
+
+/* Quick Category Bubbles */
+.category-bubble-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: transform var(--transition-smooth);
+}
+
+.category-bubble-item:hover {
+  transform: translateY(-4px);
+}
+
+.category-bubble-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 2px solid var(--border-beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-caramel);
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-warm-subtle);
+}
+
+.category-bubble-item:hover .category-bubble-circle {
+  border-color: var(--color-caramel);
+  background: var(--color-caramel-light);
+  color: var(--color-caramel-hover);
+  box-shadow: 0 8px 20px rgba(175, 110, 77, 0.2);
+}
+
+.category-bubble-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  line-height: 1.2;
+}
+
+/* "Curated For You" Product Card Styling */
+.curated-product-card {
+  background: var(--bg-beige-card);
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-warm-card);
+}
+
+.curated-product-card:hover {
+  background: var(--bg-beige-card-hover);
+  transform: translateY(-5px);
+  border-color: var(--color-caramel);
+  box-shadow: var(--shadow-warm-hover);
+}
+
+.curated-thumb-box {
+  position: relative;
+  height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(235, 227, 219, 0.6);
+}
+
+.curated-thumb-box img {
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform var(--transition-smooth);
+}
+
+.curated-product-card:hover .curated-thumb-box img {
+  transform: scale(1.06);
+}
+
+/* Soft Caramel & Espresso Badges */
+.badge-caramel-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--color-caramel);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(175, 110, 77, 0.3);
+}
+
+.badge-soft-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--bg-beige-accent);
+  color: var(--text-espresso);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+  text-transform: uppercase;
+}
+
+/* Product Card Body */
+.curated-product-title {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-espresso);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.curated-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.curated-price-current {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-caramel);
+}
+
+.curated-price-mrp {
+  font-size: 0.85rem;
+  color: var(--text-espresso-light);
+  text-decoration: line-through;
+}
+
+/* Sleek Caramel Hover Button */
+.btn-curated-cart {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--color-caramel);
+  color: var(--color-caramel);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-curated-cart:hover {
+  background: var(--color-caramel);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(175, 110, 77, 0.35);
+}
+
+.btn-curated-whatsapp {
+  width: 100%;
+  background: rgba(37, 211, 102, 0.1);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  color: #1A994A;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-curated-whatsapp:hover {
+  background: #25D366;
+  color: #FFFFFF;
+  border-color: #25D366;
+}
+
+/* Kerala Branch Locator Banner (Caramel Theme) */
+.branch-caramel-strip {
+  background: linear-gradient(135deg, #AF6E4D 0%, #965B3C 100%);
+  color: #FFFFFF;
+  padding: 2rem 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-warm-hover);
+}
+
+.btn-outlined-ivory {
+  background: transparent;
+  border: 1.5px solid #FFFFFF;
+  color: #FFFFFF;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.82rem;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-outlined-ivory:hover {
+  background: #FFFFFF;
+  color: var(--text-espresso);
+}
+
+/* Mobile Sticky Bottom Navigation (Soft Beige Theme) */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FAF7F2;
+  border-top: 1px solid var(--border-beige);
+  box-shadow: 0 -4px 16px rgba(43, 27, 23, 0.08);
+  z-index: 9999;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+}
+
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-espresso-muted);
+  position: relative;
+}
+
+.mobile-nav-btn.active,
+.mobile-nav-btn:hover {
+  color: var(--color-caramel);
+}
+
+.mobile-badge {
+  position: absolute;
+  top: -4px;
+  right: 6px;
+  background: var(--color-caramel);
+  color: #FFF;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 99px;
+}
+
+@media (min-width: 768px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Off-Canvas Mini-Cart Drawer (Caramel & Beige Theme) */
+.ld-module-cart-offcanvas {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  max-width: 100vw;
+  height: 100vh;
+  background: #FAFAF8;
+  border-left: 1px solid var(--border-beige);
+  z-index: 99999;
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-warm-drawer);
+}
+
+.ld-module-cart-offcanvas.is-active {
+  right: 0;
+}
+
+.cart-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 27, 23, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 99998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.cart-drawer-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Shipping Progress Bar (Warm Caramel Theme) */
+.liquid-shipping-progress-wrapper {
+  background: var(--color-caramel-light);
+  border: 1px solid var(--border-caramel);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.25rem;
+}
+
+.progress-bar-track {
+  height: 6px;
+  background: #EBE1D8;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-caramel), var(--color-caramel-gold));
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* Swiper Styling */
+.hero-promo-swiper {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-warm-card);
+}
+
+.hero-promo-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+  width: 8px;
+  height: 8px;
+  transition: all var(--transition-fast);
+}
+
+.hero-promo-swiper .swiper-pagination-bullet-active {
+  background: var(--color-caramel) !important;
+  width: 24px !important;
+  border-radius: 4px !important;
+}

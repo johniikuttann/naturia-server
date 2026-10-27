@@ -1,0 +1,1238 @@
+/**
+ * Venu's Digital Arcade - Main Extended Stylesheet (Modern Caramel & Beige Edition)
+ */
+
+/* Swiper Banner Custom Styling */
+.hero-promo-swiper {
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.hero-promo-swiper .swiper-pagination-bullet {
+  background: rgba(234, 221, 202, 0.6);
+  opacity: 1;
+  width: 8px;
+  height: 8px;
+  transition: all var(--transition-fast);
+}
+
+.hero-promo-swiper .swiper-pagination-bullet-active {
+  background: #AF6E4D !important;
+  width: 24px !important;
+  border-radius: 4px !important;
+}
+
+/* Multi-line Truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Hide Scrollbar */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   CART DRAWER — header, item cards, footer
+   Layout follows a conventional slide-out cart: a tinted body holding white
+   product cards, each with its own quantity stepper and remove control.
+   ========================================================================== */
+
+/* ---- Header ---- */
+.vda-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border-beige);
+  flex-shrink: 0;
+}
+
+.vda-cart-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.vda-cart-header-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-espresso);
+  flex-shrink: 0;
+}
+
+.vda-cart-header-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  margin: 0;
+  line-height: 1.1;
+}
+
+/* Count bubble beside the title. Reset positioning: the same
+   .cart-count-badge class is absolutely positioned over the header cart icon,
+   and that rule would otherwise pull this one out of the flow. */
+.vda-cart-header-count.cart-count-badge {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px !important;
+  border-radius: var(--radius-full);
+  background: var(--color-caramel) !important;
+  color: #FFFFFF !important;
+  font-family: var(--font-body);
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  line-height: 1;
+}
+
+.vda-cart-close {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-beige);
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  color: var(--text-espresso);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.vda-cart-close:hover {
+  background: var(--bg-beige-soft);
+  border-color: var(--color-caramel);
+  color: var(--color-caramel);
+}
+
+.vda-cart-close:focus-visible {
+  outline: 2px solid var(--color-caramel);
+  outline-offset: 2px;
+}
+
+/* ---- Scrollable body ---- */
+.vda-cart-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.1rem;
+  background: var(--bg-beige-soft);
+}
+
+#cart-drawer-items-list {
+  transition: opacity var(--transition-fast);
+}
+
+/* ---- Item card ---- */
+.vda-cart-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.9rem;
+  margin-bottom: 0.75rem;
+  background: #FFFFFF;
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-warm-subtle);
+}
+
+.vda-cart-item:last-child {
+  margin-bottom: 0;
+}
+
+.vda-cart-item-thumb {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-beige-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vda-cart-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vda-cart-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.vda-cart-item-title {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  line-height: 1.35;
+  margin: 0 0 2px;
+  /* Single line with an ellipsis, as in a standard cart row. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vda-cart-item-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.vda-cart-item-title a:hover {
+  color: var(--color-caramel);
+}
+
+.vda-cart-item-variant {
+  font-size: 0.8rem;
+  color: var(--text-espresso-light);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vda-cart-item-price {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  margin-bottom: 0.6rem;
+}
+
+.vda-cart-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.vda-cart-item-single {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-espresso-light);
+}
+
+/* ---- Quantity stepper ---- */
+.vda-qty-control {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--border-beige);
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.vda-qty-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-espresso);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  user-select: none;
+}
+
+.vda-qty-btn:hover {
+  background: var(--color-caramel);
+  color: #FFFFFF;
+}
+
+.vda-qty-btn:focus-visible {
+  outline: 2px solid var(--color-caramel);
+  outline-offset: -2px;
+}
+
+.vda-qty-input {
+  width: 40px;
+  height: 34px;
+  border: none;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  background: #FFFFFF;
+  -moz-appearance: textfield;
+}
+
+.vda-qty-input::-webkit-outer-spin-button,
+.vda-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.vda-qty-input:focus {
+  outline: none;
+  background: var(--bg-beige-soft);
+}
+
+/* ---- Remove ---- */
+.vda-cart-remove {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-espresso-light);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.vda-cart-remove:hover {
+  background: rgba(192, 57, 43, 0.1);
+  color: var(--color-danger);
+}
+
+.vda-cart-remove:focus-visible {
+  outline: 2px solid var(--color-caramel);
+  outline-offset: 2px;
+}
+
+/* ---- Footer ---- */
+.vda-cart-footer {
+  flex-shrink: 0;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: #FFFFFF;
+  border-top: 1px solid var(--border-beige);
+}
+
+.vda-cart-subtotal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.vda-cart-subtotal-label {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+}
+
+.vda-cart-subtotal-value {
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-caramel);
+  white-space: nowrap;
+}
+
+.vda-cart-tax-note {
+  font-size: 0.82rem;
+  color: var(--text-espresso-muted);
+  margin: 0 0 0.9rem;
+}
+
+.vda-checkout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-caramel) 0%, var(--text-espresso) 100%);
+  color: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-warm-card);
+  transition: all var(--transition-fast);
+}
+
+.vda-checkout-btn:hover {
+  color: #FFFFFF;
+  box-shadow: var(--shadow-warm-hover);
+  transform: translateY(-1px);
+}
+
+.vda-checkout-btn:focus-visible {
+  outline: 2px solid var(--color-caramel);
+  outline-offset: 2px;
+}
+
+.vda-view-cart-link {
+  display: block;
+  text-align: center;
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-espresso-muted);
+  text-decoration: none;
+}
+
+.vda-view-cart-link:hover {
+  color: var(--color-caramel);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   IN-PAGE ANCHOR SCROLLING
+   Used by the mobile bottom nav (Categories / Curated) and the header links.
+   The main header is sticky, so without scroll-margin the target section
+   lands underneath it and appears not to have scrolled at all.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+#categories,
+#curated,
+#stores,
+#reviews,
+#vda-reviews {
+  scroll-margin-top: 7rem;
+}
+
+/* Comfortable touch targets on the fixed mobile bottom bar (44px minimum). */
+.mobile-nav-btn {
+  min-height: 44px;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  flex: 1 1 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* ==========================================================================
+   ADD TO BAG — single product WooCommerce form
+   Scoped to #vda-add-to-cart-form (an ID, not just a class) and !important
+   on every shape/colour property. This isn't casual !important overuse: it
+   is the deliberate fix for a real, known conflict on this install — both
+   WooCommerce's own core button CSS and Elementor's global "Theme Style →
+   Buttons" kit CSS (Elementor is active on this site) inject their own
+   !important button rules late in <head>, after this stylesheet. A plain
+   class selector loses that fight regardless of specificity or load order;
+   an !important ID selector cannot lose it.
+   ========================================================================== */
+
+/*
+ * Shared sizing for the two primary product actions — "Add to Bag" and the
+ * WhatsApp Concierge button. They previously drifted apart (0.9rem font and
+ * 0.95rem padding versus text-xs/py-3.5), so one rendered visibly larger than
+ * the other. Both now read these variables, so they cannot fall out of step.
+ */
+.product-actions-block {
+  --vda-action-min-height: 3.1rem;
+  --vda-action-padding-y: 0.95rem;
+  --vda-action-padding-x: 1.75rem;
+  --vda-action-font-size: 0.9rem;
+}
+
+/*
+ * Quantity sits on its own row so "Add to Bag" can span the full width and
+ * therefore match the WhatsApp Concierge button below it exactly. Previously
+ * the button shared a row with the quantity box (flex: 1 1 200px), which made
+ * it narrower than the full-width Concierge button — the two actions read as
+ * different sizes even though their height and type were identical.
+ */
+#vda-add-to-cart-form form.cart {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+/*
+ * Quantity stepper — the conventional e-commerce control: a single pill with
+ * minus / value / plus. Previously this was a bare number input showing the
+ * browser's native spinner arrows, which is what made it look unfinished.
+ */
+#vda-add-to-cart-form .quantity {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  /* The form is a column flex with align-items: stretch, which would otherwise
+     stretch this pill across the full width. */
+  align-self: flex-start;
+  margin: 0;
+  float: none;
+  border: 1.5px solid var(--border-beige);
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  overflow: hidden;
+  height: var(--vda-action-min-height, 3.1rem);
+}
+
+#vda-add-to-cart-form .quantity:focus-within {
+  border-color: var(--color-caramel);
+  box-shadow: 0 0 0 3px rgba(175, 110, 77, 0.12);
+}
+
+#vda-add-to-cart-form .quantity .qty {
+  width: 52px !important;
+  height: 100%;
+  text-align: center;
+  padding: 0 !important;
+  border: none !important;
+  border-left: 1px solid var(--border-beige) !important;
+  border-right: 1px solid var(--border-beige) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-body) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  color: var(--text-espresso) !important;
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+  -moz-appearance: textfield;
+}
+
+/* Remove the native spinner arrows — the buttons are the control. */
+#vda-add-to-cart-form .quantity .qty::-webkit-outer-spin-button,
+#vda-add-to-cart-form .quantity .qty::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#vda-add-to-cart-form .quantity .qty:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* Hide the screen-reader label WooCommerce prints inside .quantity. */
+#vda-add-to-cart-form .quantity label.screen-reader-text {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.vda-step-btn {
+  width: 44px;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-caramel);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  user-select: none;
+}
+
+.vda-step-btn:hover {
+  background: var(--color-caramel);
+  color: #FFFFFF;
+}
+
+.vda-step-btn:disabled {
+  color: var(--border-beige);
+  cursor: not-allowed;
+  background: none;
+}
+
+#vda-add-to-cart-form .single_add_to_cart_button.button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  flex: none !important;
+  min-height: var(--vda-action-min-height, 3.1rem);
+  margin: 0 !important;
+  background: var(--color-caramel) !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  /* Matches the Concierge button's 2px border so both boxes measure the same. */
+  border: 2px solid var(--color-caramel) !important;
+  font-family: var(--font-body) !important;
+  font-weight: 700 !important;
+  font-size: var(--vda-action-font-size, 0.9rem) !important;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: var(--vda-action-padding-y, 0.95rem) var(--vda-action-padding-x, 1.75rem) !important;
+  border-radius: var(--radius-full) !important;
+  box-shadow: var(--shadow-warm-card) !important;
+  cursor: pointer;
+  transition: all var(--transition-fast) !important;
+}
+
+#vda-add-to-cart-form .single_add_to_cart_button.button:hover,
+#vda-add-to-cart-form .single_add_to_cart_button.button:focus {
+  background: var(--color-caramel-hover) !important;
+  border-color: var(--color-caramel-hover) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--shadow-warm-hover) !important;
+  transform: translateY(-1px);
+}
+
+#vda-add-to-cart-form .single_add_to_cart_button.button.disabled,
+#vda-add-to-cart-form .single_add_to_cart_button.button.disabled:hover,
+#vda-add-to-cart-form .single_add_to_cart_button.button:disabled {
+  background: var(--border-beige) !important;
+  border-color: var(--border-beige) !important;
+  color: var(--text-espresso-light) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/*
+ * Buy Now — replaces the old outlined "WhatsApp Concierge & Store Inquiry"
+ * button. Same destination (the branch's WhatsApp), different job on the page:
+ * this is a primary action, so it is solid WhatsApp green rather than an
+ * outline, and a rounded rectangle rather than the pill that Add to Bag uses.
+ * Two full-width pills stacked on top of each other read as one control split
+ * in half; the differing radius is what separates them.
+ *
+ * Sizing still comes from the shared --vda-action-* variables so it stays
+ * locked to the Add to Bag button above it, plus a little extra height and
+ * weight because it is the louder of the two.
+ *
+ * Not written as Tailwind arbitrary variants: those depend on the Tailwind CDN
+ * runtime scanning the DOM client-side and lose the specificity fight against
+ * WooCommerce's own button CSS, which is still loaded on this page.
+ */
+.vda-buynow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: calc(var(--vda-action-min-height, 3.1rem) + 0.25rem);
+  padding: var(--vda-action-padding-y, 0.95rem) var(--vda-action-padding-x, 1.75rem);
+  font-family: var(--font-body);
+  font-size: calc(var(--vda-action-font-size, 0.9rem) + 0.05rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  color: #FFFFFF;
+  background: #25D366;
+  border: 2px solid #25D366;
+  border-radius: 0.9rem;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.28);
+  transition: background-color 0.25s ease, border-color 0.25s ease,
+              transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.vda-buynow-btn:hover,
+.vda-buynow-btn:focus-visible {
+  color: #FFFFFF;
+  background: #1EBE5D;
+  border-color: #1EBE5D;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(30, 190, 93, 0.34);
+}
+
+.vda-buynow-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(30, 190, 93, 0.28);
+}
+
+.vda-buynow-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+#vda-add-to-cart-form .variations {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-collapse: collapse;
+}
+
+#vda-add-to-cart-form .variations td {
+  padding: 0.4rem 0;
+  vertical-align: middle;
+}
+
+#vda-add-to-cart-form .variations label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+}
+
+#vda-add-to-cart-form .variations select {
+  width: 100% !important;
+  padding: 0.65rem 0.85rem !important;
+  border-radius: var(--radius-md) !important;
+  border: 1.5px solid var(--border-beige) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  color: var(--text-espresso) !important;
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+#vda-add-to-cart-form select:focus {
+  outline: none;
+  border-color: var(--color-caramel) !important;
+  box-shadow: 0 0 0 3px rgba(175, 110, 77, 0.12) !important;
+}
+
+#vda-add-to-cart-form .woocommerce-variation-price,
+#vda-add-to-cart-form .woocommerce-variation-availability {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-espresso-muted);
+}
+
+#vda-add-to-cart-form .reset_variations {
+  font-size: 0.75rem;
+  color: var(--color-caramel);
+  text-decoration: underline;
+  margin-left: 0.5rem;
+}
+
+/* ==========================================================================
+   CUSTOMER RATING — real average star display (vda_render_star_rating())
+   Used on the homepage, category archives and the product page, so a
+   product's rating reads the same wherever it appears.
+   ========================================================================== */
+
+.vda-star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  line-height: 1;
+}
+
+/*
+ * Filled and empty stars sit side by side in normal flow — no absolute
+ * positioning and no overlapping rows, so exactly five glyphs render even
+ * if this stylesheet never loads.
+ */
+.vda-star-rating-stars {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--color-caramel-gold);
+}
+
+.vda-star-rating-empty {
+  color: var(--border-beige);
+}
+
+.vda-star-rating-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-espresso-light);
+}
+
+/* Larger treatment for the single product page hero rating */
+.vda-star-rating--lg .vda-star-rating-stars {
+  font-size: 1.75rem;
+  letter-spacing: 3px;
+}
+
+.vda-star-rating--lg .vda-star-rating-count {
+  font-size: 0.85rem;
+}
+
+.vda-star-rating-none {
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   PRODUCT REVIEWS & COMMENTS — WooCommerce's native review list + "Add a
+   review" star-rating form, restyled to match the Caramel & Beige system.
+   Rendered in its own always-visible #vda-reviews section on the product
+   page rather than inside the old Reviews tab.
+   ========================================================================== */
+
+.woocommerce-Reviews #comments {
+  margin-top: 0;
+}
+
+.woocommerce-Reviews .woocommerce-Reviews-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  margin-bottom: 1rem;
+}
+
+.woocommerce-Reviews .woocommerce-noreviews {
+  font-size: 0.88rem;
+  color: var(--text-espresso-muted);
+  background: var(--bg-beige-soft);
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.woocommerce-Reviews .comment-notes,
+.woocommerce-Reviews .logged-in-as {
+  font-size: 0.78rem;
+  color: var(--text-espresso-light);
+  margin-bottom: 0.85rem;
+}
+
+.woocommerce-Reviews .comment-notes a,
+.woocommerce-Reviews .logged-in-as a {
+  color: var(--color-caramel);
+  text-decoration: underline;
+}
+
+.woocommerce-Reviews .commentlist {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.woocommerce-Reviews .commentlist .review {
+  background: #FFFFFF;
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 0.85rem;
+}
+
+/*
+ * Colour only — deliberately no font-size or letter-spacing here.
+ * WooCommerce's native .star-rating is a fixed 5.4em-wide box using its own
+ * "star" icon font, with the filled row overlaid via ::before. Changing its
+ * type metrics shifts that overlay out of alignment and can visually double
+ * the stars, which is the same class of bug this section is fixing.
+ */
+.woocommerce-Reviews .commentlist .star-rating {
+  color: var(--border-beige);
+  margin-bottom: 0.35rem;
+}
+
+.woocommerce-Reviews .commentlist .star-rating::before {
+  color: var(--border-beige);
+}
+
+.woocommerce-Reviews .commentlist .star-rating span {
+  color: var(--color-caramel-gold);
+}
+
+.woocommerce-Reviews .commentlist .star-rating span::before {
+  color: var(--color-caramel-gold);
+}
+
+.woocommerce-Reviews .woocommerce-review__author {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--text-espresso);
+  font-size: 0.85rem;
+}
+
+.woocommerce-Reviews .woocommerce-review__dash,
+.woocommerce-Reviews .woocommerce-review__published-date {
+  font-size: 0.78rem;
+  color: var(--text-espresso-light);
+}
+
+.woocommerce-Reviews .description p {
+  font-size: 0.85rem;
+  color: var(--text-espresso-muted);
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.woocommerce-Reviews #review_form_wrapper {
+  background: var(--bg-beige-soft);
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+}
+
+.woocommerce-Reviews #reply-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  margin-bottom: 0.75rem;
+}
+
+.woocommerce-Reviews .comment-form-rating label {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+/* WooCommerce's clickable 1–5 star widget (p.stars > a) */
+.woocommerce-Reviews .comment-form-rating .stars {
+  margin-bottom: 1rem;
+}
+
+.woocommerce-Reviews .comment-form-rating .stars a {
+  color: var(--color-caramel-gold);
+  text-decoration: none;
+}
+
+.woocommerce-Reviews .comment-form-rating .stars a:focus-visible {
+  outline: 2px solid var(--color-caramel);
+  outline-offset: 2px;
+}
+
+.woocommerce-Reviews .comment-form-comment textarea,
+.woocommerce-Reviews .comment-form-author input,
+.woocommerce-Reviews .comment-form-email input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-beige);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-espresso);
+  background: #FFFFFF;
+  margin-top: 0.3rem;
+}
+
+.woocommerce-Reviews .comment-form-comment textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.woocommerce-Reviews #respond input:focus,
+.woocommerce-Reviews #respond textarea:focus {
+  outline: none;
+  border-color: var(--color-caramel);
+  box-shadow: 0 0 0 3px rgba(175, 110, 77, 0.12);
+}
+
+.woocommerce-Reviews #respond p.comment-form-author,
+.woocommerce-Reviews #respond p.comment-form-email {
+  display: inline-block;
+  width: calc(50% - 0.5rem);
+  vertical-align: top;
+}
+
+.woocommerce-Reviews #respond p.comment-form-author {
+  margin-right: 1rem;
+}
+
+.woocommerce-Reviews #respond .form-submit input#submit {
+  background: var(--color-caramel);
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.8rem 2rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-warm-card);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.woocommerce-Reviews #respond .form-submit input#submit:hover {
+  background: var(--color-caramel-hover);
+  box-shadow: var(--shadow-warm-hover);
+}
+
+@media (max-width: 640px) {
+  .woocommerce-Reviews #respond p.comment-form-author,
+  .woocommerce-Reviews #respond p.comment-form-email {
+    display: block;
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+/* ==========================================================================
+   PRODUCT GALLERY — hover zoom disabled
+   'wc-product-gallery-zoom' theme support is switched off in functions.php,
+   so WooCommerce's zoom script is not enqueued at all. This rule is a guard
+   in case a plugin re-enables it: the magnifier follows the cursor on every
+   mouse move, which makes the product image feel unstable while browsing.
+   Detail viewing is handled by the click-to-open lightbox instead.
+   ========================================================================== */
+
+.woocommerce-product-gallery .zoomImg {
+  display: none !important;
+}
+
+.woocommerce-product-gallery__image {
+  cursor: zoom-in;
+}
+
+/* ---- Cart drawer reassurance strip (replaces the free-delivery progress bar) ---- */
+.vda-cart-assurance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.9rem;
+  background: #FFFFFF;
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-md);
+}
+
+.vda-cart-assurance-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-espresso-muted);
+  white-space: nowrap;
+}
+
+.vda-cart-assurance-item svg {
+  color: var(--color-caramel);
+  flex-shrink: 0;
+}
+
+
+/* ==========================================================================
+   TEMPORARY — SIMULATED PURCHASE TEST BUTTON
+   Delete this whole block together with inc/_TEMP-test-purchase.php.
+   Deliberately ugly: it must never be mistaken for a real storefront control.
+   ========================================================================== */
+
+.vda-temp-buy {
+  margin-top: 0.85rem;
+  padding: 0.85rem;
+  border: 2px dashed #B45309;
+  border-radius: 0.75rem;
+  background: #FFFBEB;
+}
+
+.vda-temp-buy__label {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #92400E;
+}
+
+.vda-temp-buy__btn {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: #B45309;
+  border: 0;
+  border-radius: 0.55rem;
+  cursor: pointer;
+}
+
+.vda-temp-buy__btn:hover {
+  background: #92400E;
+}
+
+.vda-temp-buy__note {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: #78350F;
+}
+
+.vda-temp-buy__result {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  border-left: 4px solid #B45309;
+  background: #FEF3C7;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: #451A03;
+}
+
+.vda-temp-buy__result.is-error {
+  border-left-color: #B91C1C;
+  background: #FEE2E2;
+  color: #7F1D1D;
+}
+
+.vda-temp-buy__result code {
+  font-size: 0.72rem;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE HARDENING
+   --------------------------------------------------------------------------
+   Added after auditing the live site at 375px and 768px. The layout itself
+   was already sound — no page scrolled sideways — so nothing here moves any
+   breakpoint or rewrites a grid. These rules fix the defects that a width
+   audit does not show: text that cannot overflow its box, controls that are
+   too small to tap, and the iOS focus-zoom described below.
+
+   Front-end only. This stylesheet is enqueued on wp_enqueue_scripts and is
+   never loaded in wp-admin, so none of it can reach the WordPress backend.
+   ========================================================================== */
+
+/* ---- Nothing may be wider than its container ----
+   Guards against the Tailwind CDN runtime failing to load, in which case its
+   preflight (which normally supplies these) is absent and a single oversized
+   image would push the page sideways. */
+img,
+video,
+canvas,
+iframe,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+/* ---- Long unbroken strings ----
+   The legal pages carry email addresses, URLs and GSTIN-style identifiers with
+   no spaces in them. On a 320px screen one of those is wider than the column
+   and would otherwise stretch the page. */
+.vda-legal-content,
+.woocommerce-page .entry-content,
+.product_meta,
+.vda-panel-card {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ==========================================================================
+   MOBILE — TOUCH AND INPUT CORRECTIONS
+   ========================================================================== */
+
+@media (max-width: 640px) {
+
+  /*
+   * iOS Safari zooms the whole page in whenever a text field with a computed
+   * font-size below 16px receives focus, and does not zoom back out. Every
+   * input on this site was between 12px and 14.4px, so tapping the search box,
+   * the login form or a quantity field threw the layout off-centre and the
+   * customer had to pinch back out by hand.
+   *
+   * 16px is the exact threshold — this is not a design preference, it is the
+   * value that stops the zoom. !important is required because the sizes come
+   * from Tailwind utilities (text-xs, text-sm) applied directly on the
+   * elements, which a plain selector cannot outrank.
+   */
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /*
+   * The branch selector sits in the thin notice bar, where 16px text would
+   * make the bar noticeably taller on every page. Trimming its padding keeps
+   * the bar close to its original height while the font-size fix still applies.
+   */
+  #branch-select-dropdown {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    max-width: 11.5rem;
+  }
+
+  /*
+   * Footer link lists rendered at 16px tall — about a third of the 44px that
+   * a fingertip actually needs, with neighbouring policy links close enough to
+   * mis-tap. Padding rather than a height, so the existing spacing rhythm and
+   * the four-column grid are untouched.
+   */
+  footer li a {
+    display: inline-block;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+
+  /*
+   * Tables inside page content — the legal pages and WooCommerce's own order
+   * and address tables. These have no scroll wrapper of their own, and a
+   * four-column table cannot fit 375px. Scrolling the table beats squeezing
+   * the columns until the text is unreadable.
+   */
+  .vda-legal-content table,
+  .woocommerce table.shop_table,
+  .woocommerce table.shop_attributes,
+  .woocommerce-page table.cart {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* The two product-page actions stay comfortably tappable at small widths. */
+  .vda-buynow-btn {
+    min-height: 3.1rem;
+    font-size: 0.92rem;
+  }
+}
+
+/* ---- Very small phones (320px — iPhone SE, older Androids) ---- */
+@media (max-width: 360px) {
+  .vda-buynow-btn {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.88rem;
+  }
+
+  #branch-select-dropdown {
+    max-width: 9rem;
+  }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Mixed vegetable scraps">
+<title>Mixed vegetable scraps</title>
+<defs></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+<g stroke-width="3" stroke-linejoin="round">
+  <path d="M95 255c0-60 50-100 110-100 30 0 50 20 50 40 0 50-60 90-120 90-25 0-40-10-40-30z" fill="#7DCEA0" stroke="#229954"/>
+  <path d="M110 260c30-30 70-60 130-80M150 230c-6-20-4-34 4-46M190 205c-4-18 0-30 8-40" stroke="#229954" stroke-width="3" fill="none"/>
+  <path d="M230 250l70-28-8 42z" fill="#E67E22" stroke="#A04000"/>
+  <path d="M300 222c10-20 26-30 40-30-6 14-18 26-34 34zM298 232c18-8 34-6 44 4-16 4-30 4-42 0z" fill="#58D68D" stroke="#239B56"/>
+  <ellipse cx="160" cy="295" rx="34" ry="20" fill="#27AE60" stroke="#1E8449"/>
+  <ellipse cx="160" cy="295" rx="22" ry="12" fill="#D5F5E3"/>
+  <circle cx="155" cy="293" r="2.5" fill="#A9DFBF"/><circle cx="166" cy="297" r="2.5" fill="#A9DFBF"/>
+  <circle cx="255" cy="295" r="26" fill="#E74C3C" stroke="#A93226"/>
+  <path d="M245 280l10 6 10-6-4 10" fill="#58D68D" stroke="#239B56"/>
+  <path d="M200 300c20-12 38-14 52-8" stroke="#F5B041" stroke-width="10" stroke-linecap="round" fill="none"/>
+</g>
+</svg>

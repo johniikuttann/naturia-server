@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Coconut husk and coir">
+<title>Coconut husk and coir</title>
+<defs></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M110 300c10-20 30-30 50-24" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M122 300c16-28 26-36 56-34" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M134 300c22-36 22-42 62-24" stroke="#BCAAA4" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M146 300c10-44 18-30 68-34" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M158 300c16-20 14-36 50-24" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M170 300c22-28 30-42 56-34" stroke="#BCAAA4" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M182 300c10-36 26-30 62-24" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M194 300c16-44 22-36 68-34" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M206 300c22-20 18-42 50-24" stroke="#BCAAA4" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M218 300c10-28 14-30 56-34" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M230 300c16-36 30-36 62-24" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M242 300c22-44 26-42 68-34" stroke="#BCAAA4" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M254 300c10-20 22-30 50-24" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M266 300c16-28 18-36 56-34" stroke="#8D6E63" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M278 300c22-36 14-42 62-24" stroke="#BCAAA4" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M290 300c10-44 30-30 68-34" stroke="#A1887F" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M140 230A70 62 0 0 1 280 230z" fill="#8D6E63" stroke="#5D4037" stroke-width="4"/>
+<path d="M150 228A60 50 0 0 1 270 228" stroke="#FFFFFF" stroke-width="8" fill="none"/>
+<path d="M158 200l-6-20M180 180l-4-22M210 172v-22M240 180l4-22M262 200l6-20" stroke="#A1887F" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="210" cy="230" rx="70" ry="10" fill="#6D4C41"/>
+</svg>

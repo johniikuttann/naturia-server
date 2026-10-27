@@ -1,0 +1,145 @@
+/**
+ * Naturia (app only) — order form styles, built from the theme's tokens
+ * (same look as the product review form in main.css).
+ */
+
+/* Cookie banner vs. bottom bar: both used z-index 9999, and on phones the
+   banner's bottom buttons ("Customise") overlapped the bottom bar, so a tap
+   could land on the bar instead. On phones the banner now sits just above
+   the bar, on a higher layer. */
+#vda-cookie-banner {
+  z-index: 10000 !important;
+}
+
+@media (max-width: 767px) {
+  #vda-cookie-banner {
+    bottom: var(--vda-bottom-nav-h, 64px) !important;
+  }
+}
+
+/* Jumped-to sections stop just below the sticky header, whatever its real
+   height (--vda-header-h is measured in app-fixes.js; 7rem is the theme's
+   original value, used until it is measured). */
+#categories,
+#curated,
+#reviews,
+#vda-reviews,
+#vda-order,
+.legal-content h2 {
+  scroll-margin-top: calc(var(--vda-header-h, 7rem) + 0.75rem) !important;
+}
+
+.vda-order-field {
+  margin-bottom: 1rem;
+}
+
+.vda-order-field label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-espresso);
+  margin-bottom: 0.35rem;
+}
+
+.vda-order-field .required {
+  color: var(--color-danger);
+}
+
+.vda-order-field input,
+.vda-order-field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-beige);
+  font-family: var(--font-body);
+  font-size: 1rem; /* 16px+ stops iOS/Android zooming in on focus */
+  color: var(--text-espresso);
+  background: #FFFFFF;
+}
+
+.vda-order-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.vda-order-field input:focus,
+.vda-order-field textarea:focus {
+  outline: none;
+  border-color: var(--color-caramel);
+  box-shadow: 0 0 0 3px rgba(175, 110, 77, 0.12);
+}
+
+.vda-order-field .is-invalid {
+  border-color: var(--color-danger);
+}
+
+.vda-field-error {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.3rem;
+}
+
+.vda-order-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .vda-order-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.vda-order-payment {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--bg-beige-soft);
+  border: 1px solid var(--border-beige);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-espresso);
+  margin-bottom: 1rem;
+}
+
+.vda-order-message {
+  background: #FDEDEC;
+  border: 1px solid #F5B7B1;
+  color: #922B21;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.vda-order-form .vda-checkout-btn {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+}
+
+.vda-order-form .vda-checkout-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.vda-order-success {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.vda-order-success-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  background: #E9F7EF;
+  color: #1A994A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}

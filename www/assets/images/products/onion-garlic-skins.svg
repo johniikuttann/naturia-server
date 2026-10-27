@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Onion and garlic skins">
+<title>Onion and garlic skins</title>
+<defs></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+<g stroke-width="3" stroke-linejoin="round">
+  <path d="M95 280C110 220 150 190 190 180 170 220 150 260 140 300z" fill="#9B59B6" stroke="#6C3483"/>
+  <path d="M120 280c12-34 30-62 56-86" stroke="#D2B4DE" stroke-width="3" fill="none"/>
+  <path d="M175 300c10-70 40-120 90-140-10 50-30 100-50 150z" fill="#D4AC6E" stroke="#A67C35"/>
+  <path d="M200 296c10-48 30-86 56-112" stroke="#F3E2C2" stroke-width="3" fill="none"/>
+  <path d="M240 300c20-40 50-70 85-80-12 34-30 64-55 90z" fill="#8E44AD" stroke="#6C3483"/>
+  <path d="M140 200c25-40 60-60 95-62-22 20-40 46-50 72z" fill="#E8D5B5" stroke="#B39770"/>
+  <path d="M158 196c18-24 40-40 64-48" stroke="#FFFFFF" stroke-width="3" fill="none"/>
+  <path d="M215 230c30-30 60-40 90-36-26 14-46 34-60 58z" fill="#C39BD3" stroke="#7D3C98"/>
+  <path d="M120 300c-4-30 6-56 26-74 2 26-2 52-10 76z" fill="#F0E0C0" stroke="#B39770"/>
+</g>
+</svg>

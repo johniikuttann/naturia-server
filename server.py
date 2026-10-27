@@ -52,8 +52,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE_FILE = os.path.join(HERE, 'catalogue.json')
 UPDATE_FILE = os.path.join(HERE, 'update.json')
 SQLITE_FILE = os.path.join(HERE, 'orders.db')
-# Local testing only: the app's pages, so the app can also be tried in a browser.
-WWW = os.path.normpath(os.path.join(HERE, '..', 'android-project', 'app', 'src', 'main', 'assets', 'www'))
+# The Naturia website (same pages as the app). Served at / so customers can also order in a browser.
+WWW = os.path.join(HERE, 'www')
 
 def load_env_file():
     """Local runs: read .env.local / .env written by `neon deploy`.
@@ -403,6 +403,9 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WWW, **kwargs)
 
+    def list_directory(self, path):
+        self.send_error(404)  # never show a folder's file list
+
     # helpers ---------------------------------------------------------------
     def client_ip(self):
         fwd = self.headers.get('X-Forwarded-For', '')
@@ -483,7 +486,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_body(200, orders_csv(DB.list_orders()), 'text/csv; charset=utf-8',
                                       {'Content-Disposition': f'attachment; filename="{name}"'})
             return
-        if os.path.isdir(WWW) and not ON_RENDER:
+        if os.path.isdir(WWW) and not path.startswith(('/api/', '/admin')):
             if path == '/':
                 self.path = '/index.html'
             return super().do_GET()
@@ -591,4 +594,5 @@ if __name__ == '__main__':
     where = 'Postgres (DATABASE_URL)' if DB.postgres else f'SQLite file {SQLITE_FILE}'
     log(f'Naturia order server on http://{HOST}:{PORT}  ·  database: {where}  ·  '
         f'admin: {"on (user " + ADMIN_USER + ")" if ADMIN_PASSWORD else "OFF — set ADMIN_PASSWORD"}')
+    ThreadingHTTPServer.request_queue_size = 128  # a page opens ~40 connections at once; the default of 5 drops some
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()

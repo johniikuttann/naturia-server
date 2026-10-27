@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Crushed eggshells">
+<title>Crushed eggshells</title>
+<defs>
+<g id="shell">
+  <path d="M-44 0C-44 56 44 56 44 0L32-9 20 3 7-11-6 2-19-10-32 1z" fill="#FBEEE6" stroke="#B89B78" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M-34 8C-34 40 34 40 34 8" stroke="#FFFFFF" stroke-width="4" fill="none"/>
+  <circle cx="-14" cy="26" r="2.5" fill="#C9A982"/><circle cx="12" cy="32" r="2" fill="#C9A982"/><circle cx="22" cy="18" r="2" fill="#C9A982"/>
+</g></defs>
+<rect width="400" height="400" rx="36" fill="#FAF7F2"/>
+<circle cx="200" cy="195" r="152" fill="#F5EFEB"/>
+<ellipse cx="200" cy="322" rx="146" ry="18" fill="#EADDCA"/>
+<path d="M322 64c-36 2-55 23-53 55 32-2 53-21 53-55z" fill="#8DB277"/>
+<path d="M272 117c13-15 28-28 46-47" stroke="#5E8A4E" stroke-width="3" fill="none" stroke-linecap="round"/>
+<use href="#shell" transform="translate(135 245) rotate(-12) scale(1.35)"/><use href="#shell" transform="translate(265 250) rotate(14) scale(1.35)"/><use href="#shell" transform="translate(200 185) rotate(0) scale(1.2)"/><use href="#shell" transform="translate(200 285) rotate(180) scale(0.9)"/>
+<g fill="#FDF2E9" stroke="#D5C2A8" stroke-width="2">
+  <path d="M95 300l14-8 8 12-12 6z"/><path d="M300 296l12-6 6 12-14 4z"/><path d="M180 312l10-4 6 10-12 2z"/><path d="M230 314l12-6 4 10-12 4z"/>
+</g>
+</svg>
