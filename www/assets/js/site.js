@@ -856,7 +856,8 @@
             + (p.seller ? '<span class="sold_by block">Sold by: <span class="font-bold text-[#5C4A42]">' + p.seller + '</span></span>' : ''));
 
         // Add to Bag form (woocommerce_template_single_add_to_cart).
-        fill('#vda-add-to-cart-form', '<form class="cart" action="#" method="post" data-vda-add-form>'
+        // novalidate: Android's WebView shows no "value too large" bubble, so the checks below must speak for themselves.
+        fill('#vda-add-to-cart-form', '<form class="cart" action="#" method="post" novalidate data-vda-add-form>'
             + '<div class="quantity">'
             +   '<button type="button" class="vda-step-btn vda-step-minus" data-vda-step="-1" aria-label="Decrease quantity" tabindex="-1">&minus;</button>'
             +   '<label class="screen-reader-text" for="quantity_' + esc(p.id) + '">' + esc(p.name) + ' quantity</label>'
@@ -881,6 +882,17 @@
             if (!form) return;
             e.preventDefault();
             const qty = form.querySelector('.qty');
+            const min = SETTINGS.minQtyPerProduct || 1;
+            const wanted = parseInt(qty ? qty.value : 1, 10);
+            if (isNaN(wanted) || wanted < min || wanted > MAX_QTY) {
+                const fixed = (isNaN(wanted) || wanted < min) ? min : MAX_QTY;
+                if (qty) {
+                    qty.value = fixed;
+                    qty.dispatchEvent(new Event('input', { bubbles: true })); // refresh the − / + buttons
+                }
+                window.alert('Please choose between ' + min + ' and ' + MAX_QTY + ' sacks. The quantity has been set to ' + fixed + '.');
+                return;
+            }
             const res = addToCart(p.id, qty ? qty.value : 1);
             if (!res.success) {
                 window.alert(res.message);

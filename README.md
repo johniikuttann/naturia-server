@@ -49,6 +49,8 @@ phone; the website also gets a cookie so `/admin` opens in the browser.
   privately, not stored in this repository.
 - **Roles.** `admin`: sees the shop and `/admin` (all orders). `user`: sees the shop only. People
   who sign in with Google become `user` accounts. Orders placed while signed in note the account.
+- **The orders page updates itself.** `/admin` checks for new orders every 15 seconds and reloads when
+  one arrives (if you are in the middle of changing a status it waits and tells you instead).
 - **Change a password:** sign in → **Account → Change password**.
 - **Wrong passwords:** 10 wrong tries per phone and username in 15 minutes, then a 15 minute wait.
 - **Make a new account:** run a small script to make a hash (`hashlib.scrypt`, see `hash_password`

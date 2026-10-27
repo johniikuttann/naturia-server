@@ -473,6 +473,22 @@ LOGOUT_SCRIPT = ("document.getElementById('logout').onclick=function(e){e.preven
                  "location.href='/login.html'})}")
 
 
+# Every 15 seconds the admin page asks the server for the order list; when a new order has arrived it
+# reloads itself (or, if the owner is in the middle of changing a status, says so and waits).
+POLL_SCRIPT = """(function(){
+var seen=document.body.getAttribute('data-latest')||'',count=document.body.getAttribute('data-count')||'0',note=document.getElementById('live'),timer;
+function pad(n){return(n<10?'0':'')+n}
+function check(){fetch('/api/orders',{cache:'no-store'}).then(function(r){
+if(r.status===401||r.status===403){note.textContent='Signed out. Please sign in again.';clearInterval(timer);return null}
+return r.json()}).then(function(list){
+if(!list)return;var d=new Date();note.textContent='Updates by itself, checked '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+var latest=list.length?(list[0].order_id||''):'';
+if(latest!==seen||String(list.length)!==count){var a=document.activeElement;
+if(a&&a.form&&/^(SELECT|BUTTON|INPUT)$/.test(a.tagName)){note.textContent='New order received. Press Refresh when you have finished here.';note.style.fontWeight='700'}
+else location.reload()}}).catch(function(){})}
+timer=setInterval(check,15000)})();"""
+
+
 def admin_page(orders, who=''):
     counts = {s: sum(1 for o in orders if o['status'] == s) for s in STATUSES}
     open_value = sum(o['subtotal'] for o in orders if o['status'] not in ('delivered', 'cancelled'))
@@ -535,16 +551,17 @@ def admin_page(orders, who=''):
   .total {{ font-weight:700; margin:8px 0 0; }} .notes {{ color:var(--muted); font-style:italic; }}
   .empty {{ background:var(--beige); border:1px solid var(--border); border-radius:12px; padding:18px; }}
 </style></head>
-<body><div class="wrap">
+<body data-count="{len(orders)}" data-latest="{html.escape((orders[0]['order_id'] or '') if orders else '')}"><div class="wrap">
   <div class="top">
     <div><h1>Naturia — Orders</h1>
       <p class="sub">{len(orders)} order(s): {summary} · open orders worth {inr(open_value)}</p>
-      {f'<p class="sub">Signed in as {html.escape(who)}</p>' if who else ''}</div>
+      {f'<p class="sub">Signed in as {html.escape(who)}</p>' if who else ''}
+      <p class="sub" id="live">Updates by itself every 15 seconds.</p></div>
     <div><a class="btn" href="/admin/orders.csv">Download CSV</a> <a class="btn" href="/admin">Refresh</a>
       <a class="btn" href="/">Website</a> <a class="btn" href="/login.html" id="logout">Log out</a></div>
   </div>
   {body}
-</div><script>{LOGOUT_SCRIPT}</script></body></html>'''
+</div><script>{LOGOUT_SCRIPT}</script><script>{POLL_SCRIPT}</script></body></html>'''
 
 
 def orders_csv(orders):

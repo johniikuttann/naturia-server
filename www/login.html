@@ -40,7 +40,7 @@
 
   <section id="signed-out">
     <h1>Sign in</h1>
-    <form id="login-form">
+    <form id="login-form" novalidate>
       <label>Username
         <input name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
       </label>
@@ -68,7 +68,7 @@
 
     <details id="pw-box">
       <summary>Change password</summary>
-      <form id="pw-form" style="margin-top:12px">
+      <form id="pw-form" style="margin-top:12px" novalidate>
         <label>Current password
           <input name="old_password" type="password" autocomplete="current-password" required>
         </label>
@@ -131,6 +131,11 @@
         const form = e.target;
         const button = form.querySelector('button');
         say($('error'), '');
+        // (the app's WebView shows no "please fill this in" bubble, so say it ourselves)
+        if (!form.username.value.trim() || !form.password.value) {
+            say($('error'), 'Please enter your username and password.');
+            return;
+        }
         button.disabled = true;
         button.textContent = 'Signing in…';
         // The free server sleeps when idle and can take up to a minute to wake.
@@ -157,6 +162,8 @@
         const form = e.target;
         say($('pw-error'), '');
         $('pw-ok').hidden = true;
+        if (!form.old_password.value) { say($('pw-error'), 'Please enter your current password.'); return; }
+        if (form.new_password.value.length < 10) { say($('pw-error'), 'The new password needs at least 10 characters.'); return; }
         A.call('/api/password', { old_password: form.old_password.value, new_password: form.new_password.value }).then(function(data) {
             if (data.ok) { form.reset(); $('pw-ok').hidden = false; }
             else say($('pw-error'), data.message || 'Could not change the password.');
