@@ -19,13 +19,17 @@ Environment variables
 Endpoints
     POST /api/orders                    the app sends an order here (JSON)
     GET  /api/health                    "is the server up?" (also wakes it on Render)
-    GET  /admin                         orders page for the shop owner        (login)
+    GET  /api/app-version?version=X     the app asks "is a newer app published?" (drives the Update button)
+    GET  /download/latest               sends the phone to the newest APK listed in update.json
+    GET  /admin                        orders page for the shop owner        (login)
     POST /admin/orders/<id>/status      change an order's status              (login)
     GET  /admin/orders.csv              download every order as a spreadsheet (login)
     GET  /api/orders                    every order as JSON                   (login)
 
 Prices are never taken from the phone: every item is checked and priced
 against catalogue.json, which App/build_app.py exports from the product list.
+
+App updates are published by editing update.json (see README) and pushing to GitHub.
 """
 import base64
 import contextlib
@@ -46,6 +50,7 @@ from urllib.parse import parse_qs, quote
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE_FILE = os.path.join(HERE, 'catalogue.json')
+UPDATE_FILE = os.path.join(HERE, 'update.json')
 SQLITE_FILE = os.path.join(HERE, 'orders.db')
 # Local testing only: the app's pages, so the app can also be tried in a browser.
 WWW = os.path.normpath(os.path.join(HERE, '..', 'android-project', 'app', 'src', 'main', 'assets', 'www'))
@@ -269,6 +274,36 @@ def rate_limited(ip):
         return False
 
 
+# --------------------------------------------------------------------- app updates
+def read_update():
+    """update.json is read on every request, so a redeploy is all it takes to publish an update."""
+    try:
+        with open(UPDATE_FILE, encoding='utf-8-sig') as f:  # -sig: Windows Notepad adds a BOM
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def version_tuple(text):
+    """'2.1.0' -> (2, 1, 0, 0). None when there is no number in it."""
+    parts = [int(p) for p in re.findall(r'\d+', str(text or ''))[:4]]
+    return tuple(parts + [0] * (4 - len(parts))) if parts else None
+
+
+def update_info(current):
+    """Answer for the app's Update button. An update counts only when update.json
+    lists a newer version AND an https APK address to download it from."""
+    data = read_update()
+    latest = clean(data.get('latest_version'), 20)
+    newest, have = version_tuple(latest), version_tuple(current)
+    available = bool(newest and have and newest > have and clean(data.get('apk_url'), 500).startswith('https://'))
+    info = {'ok': True, 'update_available': available, 'latest_version': latest}
+    if available:
+        info.update(notes=clean(data.get('notes'), 300), download_url='/download/latest')
+    return info
+
+
 def inr(n):
     s = str(int(round(n)))
     if len(s) > 3:
@@ -385,8 +420,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def send_json(self, status, data):
-        self.send_body(status, json.dumps(data, ensure_ascii=False), 'application/json; charset=utf-8')
+    def send_json(self, status, data, extra=None):
+        self.send_body(status, json.dumps(data, ensure_ascii=False), 'application/json; charset=utf-8', extra)
 
     def authorised(self):
         """HTTP Basic login for the admin pages."""
@@ -420,6 +455,20 @@ class Handler(SimpleHTTPRequestHandler):
         path = self.path.split('?', 1)[0]
         if path == '/api/health':
             return self.send_json(200, {'ok': True, 'service': 'naturia-orders'})
+        if path == '/api/app-version':
+            version = (parse_qs(self.path.partition('?')[2]).get('version') or [''])[0]
+            # Public, no login: the app's pages (another origin) read it, hence the CORS header.
+            return self.send_json(200, update_info(version), {'Access-Control-Allow-Origin': '*'})
+        if path == '/download/latest':
+            url = clean(read_update().get('apk_url'), 500)
+            if not url.startswith('https://'):
+                return self.send_json(404, {'ok': False, 'message': 'No update has been published yet.'})
+            self.send_response(302)
+            self.send_header('Location', url)
+            self.send_header('Content-Length', '0')
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            return
         if path == '/api/orders':
             if self.authorised():
                 return self.send_json(200, DB.list_orders())

@@ -16,6 +16,8 @@ Neon project `naturia` (Singapore).
 | `GET /admin` | Orders page: change status, call customers | admin |
 | `GET /admin/orders.csv` | Download every order as a spreadsheet | admin |
 | `GET /api/orders` | Every order as JSON | admin |
+| `GET /api/app-version?version=2.0.0` | The app asks "is a newer app published?" Drives the **Update app** button | — |
+| `GET /download/latest` | Sends the phone to the APK named in `update.json` | — |
 
 ## Settings (environment variables)
 
@@ -46,6 +48,35 @@ The server runs at http://localhost:8787 (set `ADMIN_PASSWORD` to open `/admin`)
   reads automatically. It needs `pip install -r requirements.txt` (psycopg). `.env.local` holds the
   database password and is never committed.
 - **Without Neon:** no extra packages needed. Orders go to a local `orders.db` file.
+
+## Publishing an app update
+
+The app shows a green **Update app** button only when `update.json` lists a newer version than
+the one installed. Nothing else needs changing on the server.
+
+1. In the Android project raise `versionCode` and `versionName` in `app/build.gradle`, and set
+   `APP_VERSION` in `assets/js/app-update.js` to the same `versionName`.
+2. Build the APK and sign it with the **same keystore** as before (otherwise phones refuse it).
+3. On GitHub: **Releases → Draft a new release**, tag it (e.g. `v2.1.0`), attach `Naturia.apk`, publish.
+4. Copy the APK's link (right-click the file in the release → copy link) into `update.json`:
+
+   ```json
+   {
+     "latest_version": "2.1.0",
+     "apk_url": "https://github.com/YOU/REPO/releases/download/v2.1.0/Naturia.apk",
+     "notes": "Short line shown under the button."
+   }
+   ```
+5. Commit and push. Render redeploys in about 2 minutes; the button then appears on phones with an
+   older version. Tapping it downloads the APK; Android asks to install it (the first time, it also
+   asks to allow installs from the browser).
+
+`apk_url` must start with `https://`. If it is empty, or the file is broken, no phone sees a button.
+To switch updates off, set `latest_version` back to the version people already have.
+
+`client/app-update.js` is the app side. Copy it to the Android project's `assets/js/` and load it
+after `app-fixes.js` on every page. Phones can only get the button by installing one new APK that
+contains it; after that, every later update arrives through the button.
 
 ## Updating prices or products
 
