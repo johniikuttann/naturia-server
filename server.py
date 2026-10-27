@@ -12,16 +12,30 @@ Environment variables
     DATABASE_URL_UNPOOLED  Neon *direct* connection string, used only to create the
                            table (schema changes must not go through the pooler).
                            Optional: falls back to DATABASE_URL.
-    ADMIN_USER       admin login name (default: admin)
-    ADMIN_PASSWORD   admin password. Not set → the admin pages are switched off
+    ADMIN_USER       older shared admin login name (default: admin)
+    ADMIN_PASSWORD   older shared admin password. Optional now: it still works as a
+                     back-up way into /admin, next to the accounts below
+    GOOGLE_CLIENT_ID "Sign in with Google" client id (Google Cloud console). Not set →
+                     the Google button is hidden
+    ALLOWED_ORIGINS  extra web addresses allowed to call /api from a browser (comma separated)
     PORT             set by Render; locally defaults to 8787
 
+Accounts live in the database (table users; passwords are stored only as scrypt hashes).
+Two accounts - an admin and a customer - are created from accounts.seed.json on first start.
+Customers who use Google get an account of their own the first time they sign in.
+
 Endpoints
+    POST /api/login                     username + password → session token (and cookie)
+    POST /api/login/google              Google credential → session token (and cookie)
+    POST /api/logout                    ends the browser session
+    GET  /api/me                        who is signed in
+    GET  /api/config                    public settings for the login page (Google client id)
+    POST /api/password                  change your own password
     POST /api/orders                    the app sends an order here (JSON)
     GET  /api/health                    "is the server up?" (also wakes it on Render)
     GET  /api/app-version?version=X     the app asks "is a newer app published?" (drives the Update button)
     GET  /download/latest               sends the phone to the newest APK listed in update.json
-    GET  /admin                        orders page for the shop owner        (login)
+    GET  /admin                         orders page for the shop owner        (login)
     POST /admin/orders/<id>/status      change an order's status              (login)
     GET  /admin/orders.csv              download every order as a spreadsheet (login)
     GET  /api/orders                    every order as JSON                   (login)
@@ -34,23 +48,29 @@ App updates are published by editing update.json (see README) and pushing to Git
 import base64
 import contextlib
 import csv
+import hashlib
 import hmac
 import html
 import io
 import json
 import os
 import re
+import secrets
 import sqlite3
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
+from http.cookies import CookieError, SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, quote
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE_FILE = os.path.join(HERE, 'catalogue.json')
 UPDATE_FILE = os.path.join(HERE, 'update.json')
+SEED_FILE = os.path.join(HERE, 'accounts.seed.json')
 SQLITE_FILE = os.path.join(HERE, 'orders.db')
 # The Naturia website (same pages as the app). Served at / so customers can also order in a browser.
 WWW = os.path.join(HERE, 'www')
@@ -86,8 +106,17 @@ DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
 DATABASE_URL_UNPOOLED = os.environ.get('DATABASE_URL_UNPOOLED', '').strip()
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin').strip() or 'admin'
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+# Web addresses whose pages may call /api from a browser: the app's own address, plus any in ALLOWED_ORIGINS.
+ALLOWED_ORIGINS = {'https://appassets.androidplatform.net'} | \
+    {o.strip() for o in os.environ.get('ALLOWED_ORIGINS', '').split(',') if o.strip()}
 
-MAX_QTY = 100          # sacks per product per order
+SESSION_SECONDS = 30 * 24 * 3600   # how long a sign-in lasts
+COOKIE = 'naturia_session'
+LOGIN_TRIES = 10                   # wrong passwords per 15 minutes, per phone + username
+LOGIN_TRIES_PER_IP = 40            # ...and per phone / IP address overall
+
+MAX_QTY = 100         # sacks per product per order
 MAX_BODY = 64 * 1024
 ORDERS_PER_HOUR = 20   # per phone / IP address, to stop spam
 STATUSES = ['new', 'confirmed', 'dispatched', 'delivered', 'cancelled']
@@ -110,6 +139,7 @@ class Database:
             import psycopg  # installed on Render from requirements.txt
             self.driver = psycopg
         self._create_table()
+        self._create_account_tables()
 
     def connect(self, direct=False):
         if self.postgres:
@@ -150,6 +180,42 @@ class Database:
             subtotal NUMERIC NOT NULL,
             payment TEXT NOT NULL
         )''', direct=True)  # schema change: direct connection, not the pooler
+
+    def _create_account_tables(self):
+        idcol = 'BIGSERIAL PRIMARY KEY' if self.postgres else 'INTEGER PRIMARY KEY AUTOINCREMENT'
+        self.run(f'''CREATE TABLE IF NOT EXISTS users (
+            id {idcol},
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
+            role TEXT NOT NULL,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )''', direct=True)
+        self.run('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)', direct=True)
+
+    # accounts ------------------------------------------------------------
+    def get_user(self, username):
+        row = self.run('SELECT username, password_hash, role, name, email FROM users WHERE username = ?',
+                       (username,), 'one')
+        return dict(zip(('username', 'password_hash', 'role', 'name', 'email'), row)) if row else None
+
+    def add_user(self, username, password_hash, role, name, email=''):
+        """Never overwrites: an account that already exists keeps its (possibly changed) password."""
+        self.run('INSERT INTO users (username, password_hash, role, name, email, created_at) '
+                 'VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (username) DO NOTHING',
+                 (username, password_hash, role, name, email, datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')))
+
+    def set_password(self, username, password_hash):
+        self.run('UPDATE users SET password_hash = ? WHERE username = ?', (password_hash, username))
+
+    def setting(self, key, make):
+        """A value kept in the database, made on first use (the sign-in signing secret)."""
+        row = self.run('SELECT value FROM settings WHERE key = ?', (key,), 'one')
+        if not row:
+            self.run('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO NOTHING', (key, make()))
+            row = self.run('SELECT value FROM settings WHERE key = ?', (key,), 'one')
+        return row[0]
 
     # orders --------------------------------------------------------------
     def find_by_request(self, request_id):
@@ -274,6 +340,94 @@ def rate_limited(ip):
         return False
 
 
+# --------------------------------------------------------------------- accounts
+def hash_password(password):
+    salt = secrets.token_bytes(16)
+    digest = hashlib.scrypt(password.encode('utf-8'), salt=salt, n=16384, r=8, p=1, dklen=32)
+    return f'scrypt$16384$8$1${salt.hex()}${digest.hex()}'
+
+
+def check_password(password, stored):
+    try:
+        _, n, r, p, salt, digest = stored.split('$')
+        got = hashlib.scrypt(password.encode('utf-8'), salt=bytes.fromhex(salt), n=int(n), r=int(r), p=int(p), dklen=32)
+        return hmac.compare_digest(got, bytes.fromhex(digest))
+    except (ValueError, AttributeError):
+        return False
+
+
+def _b64(data):
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode()
+
+
+def make_token(username):
+    """A signed sign-in: who it is and when it ends. Cannot be forged without the secret in the database."""
+    body = _b64(json.dumps({'u': username, 'e': int(time.time()) + SESSION_SECONDS}).encode())
+    return body + '.' + _b64(hmac.new(SECRET, body.encode(), 'sha256').digest())
+
+
+def read_token(token):
+    """The username in a valid, unexpired token, else None."""
+    try:
+        body, sig = token.split('.')
+        if not hmac.compare_digest(sig, _b64(hmac.new(SECRET, body.encode(), 'sha256').digest())):
+            return None
+        data = json.loads(base64.urlsafe_b64decode(body + '=' * (-len(body) % 4)))
+        return data['u'] if data['e'] > time.time() else None
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return None
+
+
+FAILS = {}
+
+
+def login_blocked(*keys):
+    """Too many wrong passwords recently from this phone (and username)?"""
+    now = time.time()
+    with RATE_LOCK:
+        for key, limit in zip(keys, (LOGIN_TRIES, LOGIN_TRIES_PER_IP)):
+            FAILS[key] = [t for t in FAILS.get(key, []) if now - t < 900]
+            if len(FAILS[key]) >= limit:
+                return True
+    return False
+
+
+def note_failed_login(*keys):
+    with RATE_LOCK:
+        for key in keys:
+            FAILS.setdefault(key, []).append(time.time())
+
+
+def verify_google(credential):
+    """Ask Google whether a "Sign in with Google" credential is genuine and meant for this app.
+    Returns Google's profile for it, or None."""
+    if not GOOGLE_CLIENT_ID or not credential:
+        return None
+    try:
+        url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' + quote(credential, safe='')
+        with urllib.request.urlopen(url, timeout=10) as res:
+            info = json.load(res)
+        valid = (info.get('aud') == GOOGLE_CLIENT_ID
+                 and info.get('iss') in ('accounts.google.com', 'https://accounts.google.com')
+                 and str(info.get('email_verified')).lower() == 'true'
+                 and info.get('sub') and info.get('email')
+                 and float(info.get('exp', 0)) > time.time())
+    except (urllib.error.URLError, OSError, ValueError, TypeError):
+        return None
+    return info if valid else None
+
+
+def seed_accounts():
+    """Create the admin and customer accounts listed in accounts.seed.json if they do not exist yet."""
+    try:
+        with open(SEED_FILE, encoding='utf-8-sig') as f:
+            accounts = json.load(f)
+    except (OSError, ValueError):
+        return
+    for a in accounts:
+        DB.add_user(a['username'], a['password_hash'], a['role'], a['name'])
+
+
 # --------------------------------------------------------------------- app updates
 def read_update():
     """update.json is read on every request, so a redeploy is all it takes to publish an update."""
@@ -313,7 +467,13 @@ def inr(n):
 
 
 # --------------------------------------------------------------------- admin page
-def admin_page(orders):
+LOGOUT_SCRIPT = ("document.getElementById('logout').onclick=function(e){e.preventDefault();"
+                 "fetch('/api/logout',{method:'POST'}).finally(function(){"
+                 "try{localStorage.removeItem('naturia_token');localStorage.removeItem('naturia_user')}catch(x){}"
+                 "location.href='/login.html'})}")
+
+
+def admin_page(orders, who=''):
     counts = {s: sum(1 for o in orders if o['status'] == s) for s in STATUSES}
     open_value = sum(o['subtotal'] for o in orders if o['status'] not in ('delivered', 'cancelled'))
     summary = ' · '.join(f'{counts[s]} {s}' for s in STATUSES)
@@ -340,7 +500,8 @@ def admin_page(orders):
               <p>{html.escape(c["name"])}<br>
               📞 <a href="tel:{html.escape(c["phone"])}">{html.escape(c["phone"])}</a><br>
               {html.escape(c["address"])}<br>PIN {html.escape(c["pincode"])}</p>
-              {f'<p class="notes">Note: {html.escape(c["notes"])}</p>' if c.get("notes") else ''}</div>
+              {f'<p class="notes">Note: {html.escape(c["notes"])}</p>' if c.get("notes") else ''}
+              {f'<p class="notes">Signed-in account: {html.escape(c["account"])}</p>' if c.get("account") else ''}</div>
             <div><h3>Items</h3><ul>{items}</ul>
               <p class="total">Total: {inr(o["subtotal"])} · {html.escape(o["payment"])}</p></div>
           </div>
@@ -377,22 +538,24 @@ def admin_page(orders):
 <body><div class="wrap">
   <div class="top">
     <div><h1>Naturia — Orders</h1>
-      <p class="sub">{len(orders)} order(s): {summary} · open orders worth {inr(open_value)}</p></div>
-    <div><a class="btn" href="/admin/orders.csv">Download CSV</a> <a class="btn" href="/admin">Refresh</a></div>
+      <p class="sub">{len(orders)} order(s): {summary} · open orders worth {inr(open_value)}</p>
+      {f'<p class="sub">Signed in as {html.escape(who)}</p>' if who else ''}</div>
+    <div><a class="btn" href="/admin/orders.csv">Download CSV</a> <a class="btn" href="/admin">Refresh</a>
+      <a class="btn" href="/">Website</a> <a class="btn" href="/login.html" id="logout">Log out</a></div>
   </div>
   {body}
-</div></body></html>'''
+</div><script>{LOGOUT_SCRIPT}</script></body></html>'''
 
 
 def orders_csv(orders):
     out = io.StringIO()
     w = csv.writer(out)
-    w.writerow(['Order', 'Date (IST)', 'Status', 'Name', 'Phone', 'Address', 'PIN', 'Notes', 'Items', 'Total (Rs)', 'Payment'])
+    w.writerow(['Order', 'Date (IST)', 'Status', 'Name', 'Phone', 'Address', 'PIN', 'Notes', 'Items', 'Total (Rs)', 'Payment', 'Account'])
     for o in orders:
         c = o['customer']
         items = '; '.join(f'{i["name"]} x {i["qty"]}' for i in o['items'])
         w.writerow([o['order_id'], o['created_at'], o['status'], c['name'], c['phone'], c['address'],
-                    c['pincode'], c.get('notes', ''), items, int(round(o['subtotal'])), o['payment']])
+                    c['pincode'], c.get('notes', ''), items, int(round(o['subtotal'])), o['payment'], c.get('account', '')])
     return '﻿' + out.getvalue()  # BOM so Excel opens ₹ / Malayalam correctly
 
 
@@ -413,12 +576,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     def send_body(self, status, body, ctype, extra=None):
         data = body.encode('utf-8') if isinstance(body, str) else body
+        extra = dict(extra or {})
+        origin = self.headers.get('Origin', '')
+        if origin in ALLOWED_ORIGINS and self.path.startswith('/api/'):  # the app's pages call /api from their own address
+            extra.setdefault('Access-Control-Allow-Origin', origin)
+            extra.setdefault('Vary', 'Origin')
         self.send_response(status)
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
-        for k, v in (extra or {}).items():
+        for k, v in extra.items():
             self.send_header(k, v)
         self.end_headers()
         self.wfile.write(data)
@@ -426,22 +594,47 @@ class Handler(SimpleHTTPRequestHandler):
     def send_json(self, status, data, extra=None):
         self.send_body(status, json.dumps(data, ensure_ascii=False), 'application/json; charset=utf-8', extra)
 
-    def authorised(self):
-        """HTTP Basic login for the admin pages."""
-        if not ADMIN_PASSWORD:
-            self.send_body(503, 'Admin is switched off: set the ADMIN_PASSWORD environment variable.',
-                           'text/plain; charset=utf-8')
-            return False
+    def session_user(self, token=''):
+        """The signed-in account (from the Authorization header, the sign-in cookie, or a given token), or None."""
         header = self.headers.get('Authorization', '')
-        if header.startswith('Basic '):
+        token = token or (header[7:] if header.startswith('Bearer ') else '')
+        if not token:
             try:
-                user, _, pwd = base64.b64decode(header[6:]).decode('utf-8').partition(':')
+                cookies = SimpleCookie(self.headers.get('Cookie', ''))
+            except CookieError:
+                cookies = {}
+            token = cookies[COOKIE].value if COOKIE in cookies else ''
+        username = read_token(token) if token else None
+        if not username:
+            return None
+        try:
+            return DB.get_user(username)
+        except Exception as exc:
+            log(f'Database error: {exc!r}')
+            return None
+
+    def authorised(self, page=False):
+        """Admin pages: an admin account is signed in, or the older shared admin login (HTTP Basic) is used."""
+        user = self.session_user()
+        if user and user['role'] == 'admin':
+            return True
+        header = self.headers.get('Authorization', '')
+        if header.startswith('Basic ') and ADMIN_PASSWORD:
+            try:
+                name, _, pwd = base64.b64decode(header[6:]).decode('utf-8').partition(':')
             except Exception:
-                user, pwd = '', ''
-            if hmac.compare_digest(user, ADMIN_USER) and hmac.compare_digest(pwd, ADMIN_PASSWORD):
+                name, pwd = '', ''
+            if hmac.compare_digest(name, ADMIN_USER) and hmac.compare_digest(pwd, ADMIN_PASSWORD):
                 return True
-        self.send_body(401, 'Login required.', 'text/plain; charset=utf-8',
-                       {'WWW-Authenticate': 'Basic realm="Naturia admin", charset="UTF-8"'})
+        if user:
+            self.send_body(403, 'This account is not an admin.', 'text/plain; charset=utf-8')
+        elif page and not header and 'text/html' in self.headers.get('Accept', ''):
+            self.send_response(302)  # a browser: send them to the login page, then back here
+            self.send_header('Location', '/login.html?next=' + quote(self.path.split('?', 1)[0]))
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+        else:
+            self.send_body(401, 'Login required.', 'text/plain; charset=utf-8')
         return False
 
     def read_body(self):
@@ -472,13 +665,23 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-store')
             self.end_headers()
             return
+        if path == '/api/config':
+            return self.send_json(200, {'ok': True, 'google_client_id': GOOGLE_CLIENT_ID})
+        if path == '/api/me':
+            user = self.session_user()
+            if not user:
+                return self.send_json(401, {'ok': False, 'message': 'Not signed in.'})
+            return self.send_json(200, {'ok': True, 'username': user['username'], 'name': user['name'],
+                                        'role': user['role'], 'email': user['email']})
         if path == '/api/orders':
             if self.authorised():
                 return self.send_json(200, DB.list_orders())
             return
         if path in ('/admin', '/admin/'):
-            if self.authorised():
-                return self.send_body(200, admin_page(DB.list_orders()), 'text/html; charset=utf-8')
+            if self.authorised(page=True):
+                user = self.session_user()
+                return self.send_body(200, admin_page(DB.list_orders(), user['name'] if user else ''),
+                                      'text/html; charset=utf-8')
             return
         if path == '/admin/orders.csv':
             if self.authorised():
@@ -501,9 +704,82 @@ class Handler(SimpleHTTPRequestHandler):
             return
         return super().do_HEAD()
 
+    def do_OPTIONS(self):
+        """The browser's "may I?" check before the app's pages call /api (login, orders)."""
+        origin = self.headers.get('Origin', '')
+        self.send_response(204)
+        if origin in ALLOWED_ORIGINS:
+            self.send_header('Access-Control-Allow-Origin', origin)
+            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            self.send_header('Access-Control-Max-Age', '600')
+            self.send_header('Vary', 'Origin')
+        self.send_header('Content-Length', '0')
+        self.end_headers()
+
+    # accounts --------------------------------------------------------------
+    def finish_login(self, user):
+        token = make_token(user['username'])
+        cookie = f'{COOKIE}={token}; Path=/; Max-Age={SESSION_SECONDS}; HttpOnly; SameSite=Lax' + ('; Secure' if ON_RENDER else '')
+        self.send_json(200, {'ok': True, 'token': token, 'username': user['username'], 'name': user['name'],
+                             'role': user['role']}, {'Set-Cookie': cookie})
+
+    def account_post(self, path):
+        if path == '/api/logout':
+            return self.send_json(200, {'ok': True}, {'Set-Cookie': f'{COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax'})
+        raw = self.read_body()
+        try:
+            payload = json.loads((raw or b'').decode('utf-8'))
+            if not isinstance(payload, dict):
+                raise ValueError
+        except (ValueError, UnicodeDecodeError):
+            return self.send_json(400, {'ok': False, 'message': 'Invalid request.'})
+        ip = self.client_ip()
+
+        if path == '/api/login':
+            username = clean(payload.get('username'), 80).lower()
+            password = str(payload.get('password') or '')[:200]
+            keys = (f'{ip}|{username}', f'ip|{ip}')
+            if login_blocked(*keys):
+                return self.send_json(429, {'ok': False, 'message': 'Too many wrong attempts. Please try again in 15 minutes.'})
+            user = DB.get_user(username) if username else None
+            stored = (user or {}).get('password_hash') or NO_SUCH_USER_HASH
+            if not (check_password(password, stored) and user and user['password_hash']):
+                note_failed_login(*keys)
+                return self.send_json(401, {'ok': False, 'message': 'Wrong username or password.'})
+            return self.finish_login(user)
+
+        if path == '/api/login/google':
+            info = verify_google(str(payload.get('credential') or ''))
+            if not info:
+                return self.send_json(401, {'ok': False, 'message': 'Google sign-in did not work. Please try again.'})
+            username = 'google:' + info['sub']
+            if not DB.get_user(username):  # customers who sign in with Google are always plain customers
+                DB.add_user(username, None, 'user', clean(info.get('name') or info['email'], 80), clean(info['email'], 120))
+            return self.finish_login(DB.get_user(username))
+
+        # /api/password
+        user = self.session_user()
+        if not user or not user['password_hash']:
+            return self.send_json(401, {'ok': False, 'message': 'Please sign in first.'})
+        new = str(payload.get('new_password') or '')[:200]
+        if not check_password(str(payload.get('old_password') or ''), user['password_hash']):
+            return self.send_json(403, {'ok': False, 'message': 'The current password is wrong.'})
+        if len(new) < 10:
+            return self.send_json(422, {'ok': False, 'message': 'The new password needs at least 10 characters.'})
+        DB.set_password(user['username'], hash_password(new))
+        self.send_json(200, {'ok': True})
+
     # POST ------------------------------------------------------------------
     def do_POST(self):
         path = self.path.split('?', 1)[0]
+
+        if path in ('/api/login', '/api/login/google', '/api/logout', '/api/password'):
+            try:
+                return self.account_post(path)
+            except Exception as exc:  # database unreachable
+                log(f'Account error: {exc!r}')
+                return self.send_json(503, {'ok': False, 'message': 'Sign-in is not available right now. Please try again in a minute.'})
 
         m = re.fullmatch(r'/admin/orders/([A-Za-z0-9-]{1,32})/status', path)
         if m:
@@ -541,6 +817,11 @@ class Handler(SimpleHTTPRequestHandler):
         fields, errors = validate(payload, CATALOGUE)
         if errors:
             return self.send_json(422, {'ok': False, 'message': 'Please check the highlighted details.', 'errors': errors})
+
+        # Signed in? Note the account on the order. (The app sends its token in the order itself.)
+        account = self.session_user(str(payload.get('token') or '')[:600])
+        if account:
+            fields['customer']['account'] = account['email'] or account['username']
 
         request_id = clean(payload.get('request_id'), 64)
         try:
@@ -589,6 +870,9 @@ if not os.path.exists(CATALOGUE_FILE):
 
 CATALOGUE = load_catalogue()
 DB = Database(DATABASE_URL, DATABASE_URL_UNPOOLED)
+SECRET = DB.setting('session_secret', lambda: secrets.token_hex(32)).encode()
+NO_SUCH_USER_HASH = hash_password('no such user')  # checked against when the username is unknown, so timing gives nothing away
+seed_accounts()
 
 if __name__ == '__main__':
     where = 'Postgres (DATABASE_URL)' if DB.postgres else f'SQLite file {SQLITE_FILE}'

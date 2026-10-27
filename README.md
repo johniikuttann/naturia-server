@@ -2,7 +2,8 @@
 
 Receives orders from the Naturia Android app **and the Naturia website**, stores them in a
 Postgres database (Neon), and gives the shop owner a password-protected orders page. Orders from
-the app and the website land in the same list.
+the app and the website land in the same list. Customers and the shop owner can sign in
+(username + password, or Google); only an admin account sees the orders.
 
 **Live:** https://naturia-orders.onrender.com (orders page: `/admin`). Render service
 `naturia-orders` (free, Singapore), auto-deployed from this repository's `main` branch. Database:
@@ -15,7 +16,10 @@ Neon project `naturia` (Singapore).
 | `GET /` and the other pages | The Naturia website, served from the `www/` folder. Ordering there uses the same `/api/orders` | — |
 | `POST /api/orders` | The app and the website send orders here | — |
 | `GET /api/health` | "Is the server up?" (also wakes it on Render's free plan) | — |
-| `GET /admin` | Orders page: change status, call customers | admin |
+| `GET /login.html` | Sign-in page (website and app). Admins get an **Open admin orders** button | — |
+| `POST /api/login`, `/api/login/google`, `/api/logout`, `/api/password` | Sign in, sign in with Google, sign out, change your own password | — |
+| `GET /api/me`, `/api/config` | Who is signed in; public settings for the login page | — |
+| `GET /admin` | Orders page: change status, call customers (browsers are sent to the login page first) | admin |
 | `GET /admin/orders.csv` | Download every order as a spreadsheet | admin |
 | `GET /api/orders` | Every order as JSON | admin |
 | `GET /api/app-version?version=2.0.0` | The app asks "is a newer app published?" Drives the **Update app** button | — |
@@ -27,9 +31,43 @@ Neon project `naturia` (Singapore).
 |---|---|
 | `DATABASE_URL` | Neon **pooled** connection string (host has `-pooler`), used for order traffic. Without it the server uses a local file `orders.db` (testing only) |
 | `DATABASE_URL_UNPOOLED` | Neon **direct** connection string, used only to create the table. Optional |
-| `ADMIN_USER` | Admin login name (default `admin`) |
-| `ADMIN_PASSWORD` | Admin password. Without it the admin pages are switched off |
+| `ADMIN_USER` | Older shared admin login name (default `admin`) |
+| `ADMIN_PASSWORD` | Older shared admin password. Still works as a back-up way into `/admin`, next to the admin account below |
+| `GOOGLE_CLIENT_ID` | Turns on "Sign in with Google" (see below). Without it the Google button is hidden |
+| `ALLOWED_ORIGINS` | Extra web addresses allowed to call `/api` from a browser (comma separated). The app's own address is built in |
 | `PORT` | Set automatically by Render |
+
+## Accounts and sign-in
+
+Accounts are stored in the database (tables `users` and `settings`). Passwords are kept only as
+scrypt hashes, never as text. Signing in gives a signed token (30 days) that the app keeps on the
+phone; the website also gets a cookie so `/admin` opens in the browser.
+
+- **Two accounts are created on first start** from `accounts.seed.json`: one `admin` and one
+  customer (`user`). The file holds only the usernames and password *hashes*. A password that is
+  changed later is never overwritten by a restart. The first passwords were handed to the owner
+  privately, not stored in this repository.
+- **Roles.** `admin`: sees the shop and `/admin` (all orders). `user`: sees the shop only. People
+  who sign in with Google become `user` accounts. Orders placed while signed in note the account.
+- **Change a password:** sign in → **Account → Change password**.
+- **Wrong passwords:** 10 wrong tries per phone and username in 15 minutes, then a 15 minute wait.
+- **Make a new account:** run a small script to make a hash (`hashlib.scrypt`, see `hash_password`
+  in `server.py`) and add the entry to `accounts.seed.json`.
+- **The older shared admin login** (`ADMIN_USER` / `ADMIN_PASSWORD`) still opens `/admin`. Remove
+  `ADMIN_PASSWORD` in Render's Environment tab once you no longer want it.
+
+### Turning on "Sign in with Google"
+
+1. Google Cloud console → create a project → **APIs & Services → OAuth consent screen** (External)
+   → fill in the app name and your email.
+2. **Credentials → Create credentials → OAuth client ID → Web application**. Under **Authorized
+   JavaScript origins** add `https://naturia-orders.onrender.com`. Copy the **Client ID**.
+3. Render → service → **Environment** → add `GOOGLE_CLIENT_ID` = that Client ID. The server
+   restarts and the Google button appears on the sign-in page.
+
+Google may refuse to open its sign-in inside an Android WebView. The website works in any browser.
+For a reliable button inside the app itself, the Android code needs Google's own sign-in library
+(a new build of the app).
 
 ## Deploy on Render
 
@@ -83,7 +121,8 @@ the one installed. Nothing else needs changing on the server.
 To switch updates off, set `latest_version` back to the version people already have.
 
 `client/app-update.js` is the app side. Copy it to the Android project's `assets/js/` and load it
-after `app-fixes.js` on every page. Phones can only get the button by installing one new APK that
+after `app-fixes.js` on every page. The sign-in files (`www/login.html`, `www/assets/js/auth.js`,
+and the script line for `auth.js` on every page) must be copied into the app the same way. Phones can only get the button by installing one new APK that
 contains it; after that, every later update arrives through the button.
 
 ## Updating prices or products

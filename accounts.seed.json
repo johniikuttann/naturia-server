@@ -1,0 +1,14 @@
+[
+  {
+    "username": "nat-admin-99k4jc",
+    "role": "admin",
+    "name": "Naturia Admin",
+    "password_hash": "scrypt$16384$8$1$b6d2dd344bd5fc0cf2529ac1f201e813$c68132c52e979e4605acc657dfbe02f758599bc003b45e2fa135ad5da31eeb3e"
+  },
+  {
+    "username": "nat-customer-cdcdha",
+    "role": "user",
+    "name": "Naturia Customer",
+    "password_hash": "scrypt$16384$8$1$1a8dd35d64a6a6f773c3555c8d77a441$b07d7993249fc48995e4bfa724114c37b911ed7189ab1e5821825fac1d5ca731"
+  }
+]

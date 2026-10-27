@@ -25,6 +25,10 @@
         }
     }
 
+    function signInToken() {
+        try { return window.localStorage.getItem('naturia_token') || ''; } catch (e) { return ''; }
+    }
+
     function clearCart() {
         try { window.localStorage.setItem(CART_KEY, '[]'); } catch (e) { /* ignore */ }
         if (window.VDAStore) window.VDAStore.renderCart();
@@ -177,7 +181,8 @@
             send({
                 request_id: requestIdFor(lines),
                 customer: check.values,
-                items: lines
+                items: lines,
+                token: signInToken() // lets the server note the signed-in account on the order
             }).then(function(res) {
                 let data = {};
                 try { data = JSON.parse(res.body || '{}'); } catch (err) { data = {}; }

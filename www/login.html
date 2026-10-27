@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in – Naturia</title>
+<link rel="icon" href="assets/images/favicon.png">
+<style>
+  :root { --ivory:#FAFAF8; --beige:#F5EFEB; --border:#EBE3DB; --green:#4E7A36; --caramel:#AF6E4D; --espresso:#2B1B17; --muted:#5C4A42; --danger:#C0392B; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; background:var(--ivory); color:var(--espresso); font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; display:flex; justify-content:center; align-items:flex-start; padding:24px 16px; }
+  .card { width:100%; max-width:420px; background:#fff; border:1px solid var(--border); border-radius:20px; padding:24px 20px; box-shadow:0 4px 24px rgba(43,27,23,.06); }
+  .logo { display:block; height:44px; margin:0 auto 18px; }
+  h1 { font-family:Georgia, serif; font-size:26px; margin:0 0 14px; color:var(--green); text-align:center; }
+  label { display:block; font-size:13px; font-weight:700; margin-bottom:12px; }
+  input { display:block; width:100%; margin-top:4px; padding:12px 14px; font:inherit; border:1.5px solid var(--border); border-radius:12px; background:#fff; color:var(--espresso); }
+  input:focus { outline:none; border-color:var(--caramel); box-shadow:0 0 0 3px rgba(175,110,77,.15); }
+  .primary, .secondary { display:block; width:100%; text-align:center; text-decoration:none; font:inherit; font-weight:700; padding:12px 14px; border-radius:99px; cursor:pointer; margin-top:10px; }
+  .primary { background:var(--caramel); color:#fff; border:none; }
+  .primary:disabled { opacity:.6; cursor:wait; }
+  .secondary { background:#fff; color:var(--espresso); border:1.5px solid var(--espresso); }
+  .error, .ok { border-radius:12px; padding:10px 12px; font-size:14px; margin:0 0 12px; }
+  .error { background:#FDEDEC; border:1px solid #F5B7B1; color:#922B21; }
+  .ok { background:#E9F7EF; border:1px solid #A9DFBF; color:#1E6B3A; }
+  .or { text-align:center; color:var(--muted); font-size:13px; margin:16px 0 10px; }
+  #google-button { display:flex; justify-content:center; min-height:44px; }
+  .hint { font-size:12px; color:var(--muted); text-align:center; margin:8px 0 0; }
+  .role { text-align:center; color:var(--muted); margin:-6px 0 8px; }
+  .back, .foot { text-align:center; font-size:13px; margin:16px 0 0; }
+  a { color:var(--green); }
+  details { margin-top:16px; border-top:1px solid var(--border); padding-top:12px; }
+  summary { cursor:pointer; font-weight:700; font-size:14px; }
+  .link { background:none; border:none; color:var(--muted); text-decoration:underline; font:inherit; font-size:14px; cursor:pointer; display:block; margin:16px auto 0; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main class="card">
+  <a href="index.html"><img class="logo" src="assets/images/naturia-logo-horizontal.png" alt="Naturia"></a>
+
+  <section id="signed-out">
+    <h1>Sign in</h1>
+    <form id="login-form">
+      <label>Username
+        <input name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+      </label>
+      <label>Password
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <p class="error" id="error" role="alert" hidden></p>
+      <button class="primary" type="submit">Sign in</button>
+    </form>
+
+    <div id="google-box" hidden>
+      <p class="or">or</p>
+      <div id="google-button"></div>
+      <p class="hint" id="google-hint" hidden>Google may not open inside the app. If it does not, use your username above, or open naturia-orders.onrender.com in your phone's browser.</p>
+    </div>
+
+    <p class="back"><a href="index.html">Continue without signing in</a></p>
+  </section>
+
+  <section id="signed-in" hidden>
+    <h1 id="hello"></h1>
+    <p class="role" id="role"></p>
+    <a class="primary" id="admin-link" hidden>Open admin orders</a>
+    <a class="secondary" href="index.html">Go to the shop</a>
+
+    <details id="pw-box">
+      <summary>Change password</summary>
+      <form id="pw-form" style="margin-top:12px">
+        <label>Current password
+          <input name="old_password" type="password" autocomplete="current-password" required>
+        </label>
+        <label>New password (at least 10 characters)
+          <input name="new_password" type="password" autocomplete="new-password" minlength="10" required>
+        </label>
+        <p class="error" id="pw-error" role="alert" hidden></p>
+        <p class="ok" id="pw-ok" hidden>Password changed.</p>
+        <button class="primary" type="submit">Change password</button>
+      </form>
+    </details>
+
+    <button class="link" id="logout" type="button">Sign out</button>
+  </section>
+
+  <p class="foot"><a href="privacy-policy.html">Privacy Policy</a> · <a href="terms-conditions.html">Terms</a></p>
+</main>
+
+<script src="assets/js/auth.js"></script>
+<script>
+(function() {
+    'use strict';
+    const A = window.NaturiaAuth;
+    const $ = function(id) { return document.getElementById(id); };
+
+    function say(el, text) {
+        el.textContent = text || '';
+        el.hidden = !text;
+    }
+
+    // After signing in, go back to where the visitor was heading (a path on this site only).
+    function nextPage() {
+        const next = new URLSearchParams(window.location.search).get('next') || '';
+        return /^\/[A-Za-z0-9_\-\/.]*$/.test(next) && next.indexOf('//') !== 0 ? next : '';
+    }
+
+    function render() {
+        const user = A.user();
+        $('signed-out').hidden = !!user;
+        $('signed-in').hidden = !user;
+        if (!user) return;
+        $('hello').textContent = 'Hello, ' + user.name;
+        $('role').textContent = user.role === 'admin'
+            ? 'Admin account: you can use the shop and see every order.'
+            : 'Customer account';
+        $('admin-link').hidden = user.role !== 'admin';
+        $('admin-link').href = A.adminUrl;
+        $('pw-box').hidden = user.username.indexOf('google:') === 0; // Google accounts have no password here
+    }
+
+    function signedIn(data) {
+        A.signedIn(data);
+        const next = nextPage();
+        if (next) { window.location.href = next; return; }
+        render();
+    }
+
+    $('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const button = form.querySelector('button');
+        say($('error'), '');
+        button.disabled = true;
+        button.textContent = 'Signing in…';
+        // The free server sleeps when idle and can take up to a minute to wake.
+        const slow = window.setTimeout(function() { button.textContent = 'Connecting to server… (up to a minute)'; }, 4000);
+        A.call('/api/login', { username: form.username.value.trim(), password: form.password.value }).then(function(data) {
+            if (data.ok) { form.reset(); signedIn(data); }
+            else say($('error'), data.message || 'Could not sign in.');
+        }).finally(function() {
+            window.clearTimeout(slow);
+            button.disabled = false;
+            button.textContent = 'Sign in';
+        });
+    });
+
+    $('logout').addEventListener('click', function() {
+        A.call('/api/logout', {}).finally(function() {
+            A.signedOut();
+            render();
+        });
+    });
+
+    $('pw-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        say($('pw-error'), '');
+        $('pw-ok').hidden = true;
+        A.call('/api/password', { old_password: form.old_password.value, new_password: form.new_password.value }).then(function(data) {
+            if (data.ok) { form.reset(); $('pw-ok').hidden = false; }
+            else say($('pw-error'), data.message || 'Could not change the password.');
+        });
+    });
+
+    // "Sign in with Google" appears only when the server has a Google client id.
+    A.call('/api/config').then(function(config) {
+        if (!config.google_client_id) return;
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.onload = function() {
+            window.google.accounts.id.initialize({
+                client_id: config.google_client_id,
+                callback: function(response) {
+                    say($('error'), '');
+                    A.call('/api/login/google', { credential: response.credential }).then(function(data) {
+                        if (data.ok) signedIn(data);
+                        else say($('error'), data.message || 'Google sign-in did not work.');
+                    });
+                }
+            });
+            window.google.accounts.id.renderButton($('google-button'), { theme: 'outline', size: 'large', width: 280, text: 'signin_with' });
+            $('google-box').hidden = false;
+            $('google-hint').hidden = !window.PeelMarketNative;
+        };
+        document.head.appendChild(script);
+    });
+
+    render();
+    // Show the right page straight away, then check the sign-in is still good.
+    if (A.user()) A.call('/api/me').then(function(data) {
+        if (data.status === 401) { A.signedOut(); render(); }
+    });
+})();
+</script>
+</body>
+</html>
