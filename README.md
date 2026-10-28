@@ -70,7 +70,10 @@ phone; the website also gets a cookie so `/admin` opens in the browser.
 - **Admin forms** only accept a post from our own address (an exact match), the cookie is `HttpOnly` + `SameSite=Lax` (+ `Secure` on Render).
 - **Every reply** carries `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: same-origin`.
 - Only the `www/` folder can be downloaded; `server.py`, the database, the account list and the key files cannot.
-- Broken, oversized or deeply nested requests are refused with a clear error, never a crash.
+- Broken, oversized or deeply nested requests are refused with a clear error, never a crash. The request body is always read
+  before replying, so a refused upload never resets the connection.
+- Changing the status of an order that does not exist answers 404 (it no longer says "ok").
+- The in-memory rate-limit lists are trimmed, so a flood of made-up names or addresses cannot fill the server's memory.
 - Re-test after any change with `tests/security_test.py` and `tests/xss_test.js` (see `tests/README.md` in the project folder).
 
 ### Turning on "Sign in with Google"

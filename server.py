@@ -115,7 +115,7 @@ ALLOWED_ORIGINS = {'https://appassets.androidplatform.net'} | \
 SESSION_SECONDS = 30 * 24 * 3600   # how long a sign-in lasts
 COOKIE = 'naturia_session'
 LOGIN_TRIES = 10                   # wrong passwords per 15 minutes, per phone + username
-LOGIN_TRIES_PER_IP = 40            # ...and per phone / IP address overall
+LOGIN_TRIES_PER_IP = int(os.environ.get('LOGIN_TRIES_PER_IP') or 40)  # ...and per phone / IP address overall (env: for tests)
 LOGIN_TRIES_PER_USER = 100         # ...and per username from anywhere (faking the address does not help)
 ORDERS_PER_HOUR_PER_PHONE = 20     # orders per customer phone number per hour
 ORDERS_PER_HOUR_ALL = 400          # circuit breaker: orders per hour in total
@@ -123,7 +123,7 @@ JSON_ERRORS = (ValueError, UnicodeDecodeError, RecursionError)  # what a broken 
 
 MAX_QTY = 100         # sacks per product per order
 MAX_BODY = 64 * 1024
-ORDERS_PER_HOUR = 20   # per phone / IP address, to stop spam
+ORDERS_PER_HOUR = int(os.environ.get('ORDERS_PER_HOUR') or 20)   # per IP address, to stop spam (the env setting is for tests)
 STATUSES = ['new', 'confirmed', 'dispatched', 'delivered', 'cancelled']
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -260,7 +260,11 @@ class Database:
         } for r in rows]
 
     def set_status(self, order_id, status):
+        """False when there is no such order."""
+        if not self.run('SELECT 1 FROM orders WHERE order_id = ?', (order_id,), 'one'):
+            return False
         self.run('UPDATE orders SET status = ? WHERE order_id = ?', (status, order_id))
+        return True
 
 
 # --------------------------------------------------------------------- orders
@@ -340,6 +344,7 @@ def rate_limited(key, limit=None):
     limit = limit or ORDERS_PER_HOUR
     now = time.time()
     with RATE_LOCK:
+        prune(RATE, 3600)
         hits = [t for t in RATE.get(key, []) if now - t < 3600]
         if len(hits) >= limit:
             RATE[key] = hits
@@ -414,8 +419,22 @@ def login_blocked(*keys):
     return False
 
 
+def prune(table, window):
+    """The attempt lists are kept in memory. Someone sending thousands of made-up names or addresses must not
+    be able to fill it: forget old entries, and in a real flood keep only the newest half."""
+    if len(table) < 5000:
+        return
+    now = time.time()
+    for k in [k for k, hits in table.items() if not hits or now - hits[-1] > window]:
+        del table[k]
+    if len(table) > 20000:
+        for k in sorted(table, key=lambda k: table[k][-1])[:len(table) // 2]:
+            del table[k]
+
+
 def note_failed_login(*keys):
     with RATE_LOCK:
+        prune(FAILS, 900)
         for key in keys:
             FAILS.setdefault(key, []).append(time.time())
 
@@ -725,13 +744,27 @@ class Handler(SimpleHTTPRequestHandler):
         return False
 
     def read_body(self):
-        try:
-            length = int(self.headers.get('Content-Length') or 0)
-        except ValueError:
-            length = 0
-        if length <= 0 or length > MAX_BODY:
-            return None
-        return self.rfile.read(length)
+        """The request body, or None if there is none or it is too big. It is read once, at the start of every
+        POST, even when the answer will be an error: replying and closing with the body still unread makes the
+        connection reset and the caller sees "cannot reach the server" instead of the real answer."""
+        if not hasattr(self, '_body'):
+            try:
+                length = int(self.headers.get('Content-Length') or 0)
+            except ValueError:
+                length = 0
+            if length <= 0:
+                self._body = None
+            elif length > MAX_BODY:
+                left = min(length, 1 << 20)  # throw away (a limited amount of) what was sent
+                while left > 0:
+                    chunk = self.rfile.read(min(65536, left))
+                    if not chunk:
+                        break
+                    left -= len(chunk)
+                self._body = None
+            else:
+                self._body = self.rfile.read(length)
+        return self._body
 
     # GET -------------------------------------------------------------------
     def do_GET(self):
@@ -867,6 +900,7 @@ class Handler(SimpleHTTPRequestHandler):
     # POST ------------------------------------------------------------------
     def do_POST(self):
         path = self.path.split('?', 1)[0]
+        self.read_body()  # always take the body off the connection first (see read_body)
 
         if path in ('/api/login', '/api/login/google', '/api/logout', '/api/password'):
             try:
@@ -888,7 +922,8 @@ class Handler(SimpleHTTPRequestHandler):
             status = (parse_qs(raw.decode('utf-8', 'replace')).get('status') or [''])[0]
             if status not in STATUSES:
                 return self.send_body(400, 'Unknown status.', 'text/plain; charset=utf-8')
-            DB.set_status(m.group(1), status)
+            if not DB.set_status(m.group(1), status):
+                return self.send_body(404, 'No such order.', 'text/plain; charset=utf-8')
             self.send_response(303)
             self.send_header('Location', '/admin')
             self.send_header('Content-Length', '0')
@@ -907,10 +942,12 @@ class Handler(SimpleHTTPRequestHandler):
             if status not in STATUSES:
                 return self.send_json(422, {'ok': False, 'message': 'Unknown status.'})
             try:
-                DB.set_status(m.group(1), status)
+                found = DB.set_status(m.group(1), status)
             except Exception as exc:
                 log(f'Database error: {exc!r}')
                 return self.send_json(503, {'ok': False, 'message': 'Could not save the status. Please try again.'})
+            if not found:
+                return self.send_json(404, {'ok': False, 'message': 'No such order.'})
             return self.send_json(200, {'ok': True, 'order_id': m.group(1), 'status': status})
 
         if path != '/api/orders':
@@ -961,7 +998,8 @@ class Handler(SimpleHTTPRequestHandler):
             f'{len(fields["items"])} item(s), Rs. {inr(subtotal)[1:]}')
 
     def log_message(self, fmt, *args):
-        if self.path.startswith(('/api/', '/admin')):
+        # (a request that is too long to even read has no path yet; that must not break the reply)
+        if getattr(self, 'path', '').startswith(('/api/', '/admin')):
             log('%s %s' % (self.client_ip(), fmt % args))
 
 
