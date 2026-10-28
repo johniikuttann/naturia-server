@@ -1,7 +1,7 @@
 {
-  "latest_version": "3.0.0",
+  "latest_version": "3.0.1",
   "apk_url": "https://raw.githubusercontent.com/johniikuttann/naturia-server/main/apk/Naturia.apk",
-  "notes": "Naturia is now a real Android app: faster, works without internet for browsing, login, and an admin orders screen.",
-  "sha256": "8ee36e96d07a0ed547df9e185425edfc945c014f50c32058678379ff5a0b00b1",
-  "size_bytes": 8639546
+  "notes": "Security update: a changed password now ends old sign-ins, plus tighter protection against guessing.",
+  "sha256": "7de3d46ba970d6bfcb4f07c83aada8bbb6abd0ab2106b0f1f30fc418f1262e39",
+  "size_bytes": 8639994
 }

@@ -165,7 +165,11 @@
         if (!form.old_password.value) { say($('pw-error'), 'Please enter your current password.'); return; }
         if (form.new_password.value.length < 10) { say($('pw-error'), 'The new password needs at least 10 characters.'); return; }
         A.call('/api/password', { old_password: form.old_password.value, new_password: form.new_password.value }).then(function(data) {
-            if (data.ok) { form.reset(); $('pw-ok').hidden = false; }
+            if (data.ok) {
+                form.reset();
+                $('pw-ok').hidden = false;
+                if (data.token) A.signedIn(data); // the old sign-in just ended; keep this one
+            }
             else say($('pw-error'), data.message || 'Could not change the password.');
         });
     });

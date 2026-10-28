@@ -58,6 +58,21 @@ phone; the website also gets a cookie so `/admin` opens in the browser.
 - **The older shared admin login** (`ADMIN_USER` / `ADMIN_PASSWORD`) still opens `/admin`. Remove
   `ADMIN_PASSWORD` in Render's Environment tab once you no longer want it.
 
+### Security measures
+
+- **Passwords** are stored only as scrypt hashes. **Sign-ins** are signed tokens tied to the current password:
+  changing a password ends every older sign-in (a stolen token stops working). The device that changed it gets a fresh one.
+- **Guessing is limited three ways**: 10 wrong tries per address + username, 40 per address, and 100 per username from
+  anywhere, each per 15 minutes. Orders are limited per address (20/hour), per phone number (20/hour) and in total (400/hour).
+  On Render the address comes from Cloudflare's `CF-Connecting-IP` (a visitor cannot fake it); `X-Forwarded-For` is not trusted.
+- **Everything typed into an order is escaped** on the orders page, and the CSV download puts a `'` in front of any cell that starts
+  with `= + - @`, so a customer cannot plant a spreadsheet formula.
+- **Admin forms** only accept a post from our own address (an exact match), the cookie is `HttpOnly` + `SameSite=Lax` (+ `Secure` on Render).
+- **Every reply** carries `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: same-origin`.
+- Only the `www/` folder can be downloaded; `server.py`, the database, the account list and the key files cannot.
+- Broken, oversized or deeply nested requests are refused with a clear error, never a crash.
+- Re-test after any change with `tests/security_test.py` and `tests/xss_test.js` (see `tests/README.md` in the project folder).
+
 ### Turning on "Sign in with Google"
 
 1. Google Cloud console → create a project → **APIs & Services → OAuth consent screen** (External)

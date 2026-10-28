@@ -65,7 +65,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from http.cookies import CookieError, SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, quote
+from urllib.parse import parse_qs, quote, urlparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE_FILE = os.path.join(HERE, 'catalogue.json')
@@ -116,6 +116,10 @@ SESSION_SECONDS = 30 * 24 * 3600   # how long a sign-in lasts
 COOKIE = 'naturia_session'
 LOGIN_TRIES = 10                   # wrong passwords per 15 minutes, per phone + username
 LOGIN_TRIES_PER_IP = 40            # ...and per phone / IP address overall
+LOGIN_TRIES_PER_USER = 100         # ...and per username from anywhere (faking the address does not help)
+ORDERS_PER_HOUR_PER_PHONE = 20     # orders per customer phone number per hour
+ORDERS_PER_HOUR_ALL = 400          # circuit breaker: orders per hour in total
+JSON_ERRORS = (ValueError, UnicodeDecodeError, RecursionError)  # what a broken or hostile request body can raise
 
 MAX_QTY = 100         # sacks per product per order
 MAX_BODY = 64 * 1024
@@ -279,7 +283,8 @@ def clean(value, limit):
 
 def validate(payload, catalogue):
     errors = {}
-    customer = payload.get('customer') or {}
+    customer = payload.get('customer')
+    customer = customer if isinstance(customer, dict) else {}  # anything else is just "no details"
     name = clean(customer.get('name'), 80)
     phone = re.sub(r'[\s-]', '', str(customer.get('phone') or ''))
     address = clean(customer.get('address'), 400)
@@ -301,10 +306,11 @@ def validate(payload, catalogue):
         errors['items'] = 'Your bag is empty.'
     else:
         for raw in raw_items[:50]:
-            pid = str((raw or {}).get('id') or '')
+            raw = raw if isinstance(raw, dict) else {}
+            pid = str(raw.get('id') or '')
             try:
-                qty = int((raw or {}).get('qty'))
-            except (TypeError, ValueError):
+                qty = int(raw.get('qty'))
+            except (TypeError, ValueError, OverflowError):
                 qty = 0
             product = catalogue.get(pid)
             if not product:
@@ -329,15 +335,17 @@ RATE = {}
 RATE_LOCK = threading.Lock()
 
 
-def rate_limited(ip):
+def rate_limited(key, limit=None):
+    """True when [key] (an address, a phone number or 'all') has used up its orders for this hour."""
+    limit = limit or ORDERS_PER_HOUR
     now = time.time()
     with RATE_LOCK:
-        hits = [t for t in RATE.get(ip, []) if now - t < 3600]
-        if len(hits) >= ORDERS_PER_HOUR:
-            RATE[ip] = hits
+        hits = [t for t in RATE.get(key, []) if now - t < 3600]
+        if len(hits) >= limit:
+            RATE[key] = hits
             return True
         hits.append(now)
-        RATE[ip] = hits
+        RATE[key] = hits
         return False
 
 
@@ -361,22 +369,35 @@ def _b64(data):
     return base64.urlsafe_b64encode(data).rstrip(b'=').decode()
 
 
-def make_token(username):
-    """A signed sign-in: who it is and when it ends. Cannot be forged without the secret in the database."""
-    body = _b64(json.dumps({'u': username, 'e': int(time.time()) + SESSION_SECONDS}).encode())
+def password_stamp(user):
+    """A short fingerprint of the account's current password. Signed into the token, so changing the
+    password ends every older sign-in (a stolen token stops working)."""
+    return hashlib.sha256((user.get('password_hash') or '').encode()).hexdigest()[:12]
+
+
+def make_token(username, stamp=''):
+    """A signed sign-in: who it is, which password it belongs to, and when it ends.
+    Cannot be forged without the secret in the database."""
+    body = _b64(json.dumps({'u': username, 'p': stamp, 'e': int(time.time()) + SESSION_SECONDS}).encode())
     return body + '.' + _b64(hmac.new(SECRET, body.encode(), 'sha256').digest())
 
 
-def read_token(token):
-    """The username in a valid, unexpired token, else None."""
+def read_token_data(token):
+    """The contents of a valid, unexpired token ({'u': username, 'p': stamp}), else None."""
     try:
         body, sig = token.split('.')
         if not hmac.compare_digest(sig, _b64(hmac.new(SECRET, body.encode(), 'sha256').digest())):
             return None
         data = json.loads(base64.urlsafe_b64decode(body + '=' * (-len(body) % 4)))
-        return data['u'] if data['e'] > time.time() else None
+        return data if data['e'] > time.time() and isinstance(data['u'], str) else None
     except (ValueError, KeyError, TypeError, AttributeError):
         return None
+
+
+def read_token(token):
+    """The username in a valid, unexpired token, else None."""
+    data = read_token_data(token)
+    return data['u'] if data else None
 
 
 FAILS = {}
@@ -386,7 +407,7 @@ def login_blocked(*keys):
     """Too many wrong passwords recently from this phone (and username)?"""
     now = time.time()
     with RATE_LOCK:
-        for key, limit in zip(keys, (LOGIN_TRIES, LOGIN_TRIES_PER_IP)):
+        for key, limit in zip(keys, (LOGIN_TRIES, LOGIN_TRIES_PER_IP, LOGIN_TRIES_PER_USER)):
             FAILS[key] = [t for t in FAILS.get(key, []) if now - t < 900]
             if len(FAILS[key]) >= limit:
                 return True
@@ -582,6 +603,13 @@ def admin_page(orders, who=''):
 </div><script>{LOGOUT_SCRIPT}</script><script>{POLL_SCRIPT}</script></body></html>'''
 
 
+def safe_cell(value):
+    """A spreadsheet runs a cell that starts with = + - @ as a formula. A customer could type one into
+    their name, so such text gets a leading ' and stays plain text."""
+    text = str(value)
+    return "'" + text if text[:1] in ('=', '+', '-', '@', '\t', '\r') else text
+
+
 def orders_csv(orders):
     out = io.StringIO()
     w = csv.writer(out)
@@ -589,14 +617,28 @@ def orders_csv(orders):
     for o in orders:
         c = o['customer']
         items = '; '.join(f'{i["name"]} x {i["qty"]}' for i in o['items'])
-        w.writerow([o['order_id'], o['created_at'], o['status'], c['name'], c['phone'], c['address'],
-                    c['pincode'], c.get('notes', ''), items, int(round(o['subtotal'])), o['payment'], c.get('account', '')])
+        w.writerow([safe_cell(x) for x in (o['order_id'], o['created_at'], o['status'], c['name'], c['phone'], c['address'],
+                                          c['pincode'], c.get('notes', ''), items)] + [int(round(o['subtotal']))]
+                   + [safe_cell(x) for x in (o['payment'], c.get('account', ''))])
     return '﻿' + out.getvalue()  # BOM so Excel opens ₹ / Malayalam correctly
 
 
 # --------------------------------------------------------------------- HTTP
+SECURITY_HEADERS = {
+    'X-Content-Type-Options': 'nosniff',   # a file is only ever treated as what it says it is
+    'X-Frame-Options': 'DENY',             # no other website can show our pages (login, admin) in a hidden frame
+    'Referrer-Policy': 'same-origin',      # page addresses are not sent to other sites
+}
+
+
 class Handler(SimpleHTTPRequestHandler):
     server_version = 'Naturia'
+    sys_version = ''  # do not announce which Python is running
+
+    def end_headers(self):
+        for k, v in SECURITY_HEADERS.items():
+            self.send_header(k, v)
+        super().end_headers()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WWW, **kwargs)
@@ -606,8 +648,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     # helpers ---------------------------------------------------------------
     def client_ip(self):
-        fwd = self.headers.get('X-Forwarded-For', '')
-        return fwd.split(',')[0].strip() if fwd else self.client_address[0]
+        """Who is really calling. On Render the request comes through Cloudflare, which always sets
+        CF-Connecting-IP and overwrites any value a visitor sends. X-Forwarded-For can be faked by the
+        visitor, so it is only a fallback there, and is ignored when running anywhere else."""
+        if ON_RENDER:
+            cloudflare = self.headers.get('CF-Connecting-IP', '').strip()
+            if cloudflare:
+                return cloudflare
+            fwd = self.headers.get('X-Forwarded-For', '')
+            if fwd:
+                return fwd.split(',')[0].strip()
+        return self.client_address[0]
 
     def send_body(self, status, body, ctype, extra=None):
         data = body.encode('utf-8') if isinstance(body, str) else body
@@ -620,7 +671,6 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
-        self.send_header('X-Content-Type-Options', 'nosniff')
         for k, v in extra.items():
             self.send_header(k, v)
         self.end_headers()
@@ -639,14 +689,16 @@ class Handler(SimpleHTTPRequestHandler):
             except CookieError:
                 cookies = {}
             token = cookies[COOKIE].value if COOKIE in cookies else ''
-        username = read_token(token) if token else None
-        if not username:
+        data = read_token_data(token) if token else None
+        if not data:
             return None
         try:
-            return DB.get_user(username)
+            user = DB.get_user(data['u'])
         except Exception as exc:
             log(f'Database error: {exc!r}')
             return None
+        # A sign-in made before the password was last changed no longer counts.
+        return user if user and hmac.compare_digest(str(data.get('p', '')), password_stamp(user)) else None
 
     def authorised(self, page=False):
         """Admin pages: an admin account is signed in, or the older shared admin login (HTTP Basic) is used."""
@@ -684,6 +736,8 @@ class Handler(SimpleHTTPRequestHandler):
     # GET -------------------------------------------------------------------
     def do_GET(self):
         path = self.path.split('?', 1)[0]
+        if '\x00' in self.path or '%00' in self.path.lower():  # a NUL byte in a file name is never genuine
+            return self.send_json(400, {'ok': False, 'message': 'Invalid request.'})
         if path == '/api/health':
             return self.send_json(200, {'ok': True, 'service': 'naturia-orders'})
         if path == '/api/app-version':
@@ -735,6 +789,8 @@ class Handler(SimpleHTTPRequestHandler):
         return self.send_json(404, {'ok': False, 'message': 'Not found'})
 
     def do_HEAD(self):
+        if '\x00' in self.path or '%00' in self.path.lower():
+            return self.send_error(400)
         if self.path.split('?', 1)[0] == '/api/health':
             self.send_response(200)
             self.end_headers()
@@ -756,7 +812,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     # accounts --------------------------------------------------------------
     def finish_login(self, user):
-        token = make_token(user['username'])
+        token = make_token(user['username'], password_stamp(user))
         cookie = f'{COOKIE}={token}; Path=/; Max-Age={SESSION_SECONDS}; HttpOnly; SameSite=Lax' + ('; Secure' if ON_RENDER else '')
         self.send_json(200, {'ok': True, 'token': token, 'username': user['username'], 'name': user['name'],
                              'role': user['role']}, {'Set-Cookie': cookie})
@@ -769,14 +825,14 @@ class Handler(SimpleHTTPRequestHandler):
             payload = json.loads((raw or b'').decode('utf-8'))
             if not isinstance(payload, dict):
                 raise ValueError
-        except (ValueError, UnicodeDecodeError):
+        except JSON_ERRORS:
             return self.send_json(400, {'ok': False, 'message': 'Invalid request.'})
         ip = self.client_ip()
 
         if path == '/api/login':
             username = clean(payload.get('username'), 80).lower()
             password = str(payload.get('password') or '')[:200]
-            keys = (f'{ip}|{username}', f'ip|{ip}')
+            keys = (f'{ip}|{username}', f'ip|{ip}', f'user|{username}')
             if login_blocked(*keys):
                 return self.send_json(429, {'ok': False, 'message': 'Too many wrong attempts. Please try again in 15 minutes.'})
             user = DB.get_user(username) if username else None
@@ -805,7 +861,8 @@ class Handler(SimpleHTTPRequestHandler):
         if len(new) < 10:
             return self.send_json(422, {'ok': False, 'message': 'The new password needs at least 10 characters.'})
         DB.set_password(user['username'], hash_password(new))
-        self.send_json(200, {'ok': True})
+        # Every older sign-in just ended; this device gets a fresh one so it stays signed in.
+        self.finish_login(DB.get_user(user['username']))
 
     # POST ------------------------------------------------------------------
     def do_POST(self):
@@ -822,10 +879,10 @@ class Handler(SimpleHTTPRequestHandler):
         if m:
             if not self.authorised():
                 return
-            # Only accept the form from the admin page itself.
+            # Only accept the form from the admin page itself (the address must match exactly, not just contain ours).
             origin = self.headers.get('Origin') or self.headers.get('Referer') or ''
             host = self.headers.get('Host', '')
-            if origin and host and host not in origin:
+            if origin and host and urlparse(origin).netloc != host:
                 return self.send_body(403, 'Forbidden.', 'text/plain; charset=utf-8')
             raw = self.read_body() or b''
             status = (parse_qs(raw.decode('utf-8', 'replace')).get('status') or [''])[0]
@@ -845,7 +902,7 @@ class Handler(SimpleHTTPRequestHandler):
             try:
                 body = json.loads((self.read_body() or b'').decode('utf-8'))
                 status = body.get('status') if isinstance(body, dict) else None
-            except (ValueError, UnicodeDecodeError):
+            except JSON_ERRORS:
                 status = None
             if status not in STATUSES:
                 return self.send_json(422, {'ok': False, 'message': 'Unknown status.'})
@@ -866,7 +923,7 @@ class Handler(SimpleHTTPRequestHandler):
             payload = json.loads(raw.decode('utf-8'))
             if not isinstance(payload, dict):
                 raise ValueError
-        except (ValueError, UnicodeDecodeError):
+        except JSON_ERRORS:
             return self.send_json(400, {'ok': False, 'message': 'Invalid request.'})
 
         fields, errors = validate(payload, CATALOGUE)
@@ -886,7 +943,9 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(503, {'ok': False, 'message': 'The order could not be saved right now. Please try again in a minute.'})
         if existing:  # a retry of an order already saved — not a new order
             return self.send_json(201, {'ok': True, 'order_id': existing[0], 'subtotal': existing[1], 'duplicate': True})
-        if rate_limited(self.client_ip()):
+        # Limits that faking an address cannot get around: per phone number, and in total.
+        if (rate_limited(self.client_ip()) or rate_limited('phone:' + fields['customer']['phone'], ORDERS_PER_HOUR_PER_PHONE)
+                or rate_limited('all', ORDERS_PER_HOUR_ALL)):
             return self.send_json(429, {'ok': False, 'message': 'Too many orders from this phone. Please try again later.'})
 
         try:
