@@ -70,6 +70,7 @@ from urllib.parse import parse_qs, quote
 HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE_FILE = os.path.join(HERE, 'catalogue.json')
 UPDATE_FILE = os.path.join(HERE, 'update.json')
+PRODUCTS_FILE = os.path.join(HERE, 'products.json')   # made by make_products.js; the Android app reads it
 SEED_FILE = os.path.join(HERE, 'accounts.seed.json')
 SQLITE_FILE = os.path.join(HERE, 'orders.db')
 # The Naturia website (same pages as the app). Served at / so customers can also order in a browser.
@@ -428,6 +429,23 @@ def seed_accounts():
         DB.add_user(a['username'], a['password_hash'], a['role'], a['name'])
 
 
+# --------------------------------------------------------------------- product list for the Android app
+def products_payload():
+    """Product details from products.json, with prices always taken from catalogue.json (the prices
+    the server really charges). Products the server cannot sell are left out."""
+    try:
+        with open(PRODUCTS_FILE, encoding='utf-8-sig') as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return {'categories': [], 'products': []}
+    products = []
+    for p in data.get('products', []):
+        priced = CATALOGUE.get(p.get('id'))
+        if priced:
+            products.append(dict(p, regular_price=priced['regular_price'], sale_price=priced.get('sale_price', '')))
+    return {'categories': data.get('categories', []), 'products': products}
+
+
 # --------------------------------------------------------------------- app updates
 def read_update():
     """update.json is read on every request, so a redeploy is all it takes to publish an update."""
@@ -684,6 +702,8 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if path == '/api/config':
             return self.send_json(200, {'ok': True, 'google_client_id': GOOGLE_CLIENT_ID})
+        if path == '/api/products':
+            return self.send_json(200, dict(products_payload(), ok=True))
         if path == '/api/me':
             user = self.session_user()
             if not user:
@@ -817,6 +837,24 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_header('Content-Length', '0')
             self.end_headers()
             return
+
+        m = re.fullmatch(r'/api/orders/([A-Za-z0-9-]{1,32})/status', path)  # the Android app's admin screen
+        if m:
+            if not self.authorised():
+                return
+            try:
+                body = json.loads((self.read_body() or b'').decode('utf-8'))
+                status = body.get('status') if isinstance(body, dict) else None
+            except (ValueError, UnicodeDecodeError):
+                status = None
+            if status not in STATUSES:
+                return self.send_json(422, {'ok': False, 'message': 'Unknown status.'})
+            try:
+                DB.set_status(m.group(1), status)
+            except Exception as exc:
+                log(f'Database error: {exc!r}')
+                return self.send_json(503, {'ok': False, 'message': 'Could not save the status. Please try again.'})
+            return self.send_json(200, {'ok': True, 'order_id': m.group(1), 'status': status})
 
         if path != '/api/orders':
             return self.send_json(404, {'ok': False, 'message': 'Not found'})

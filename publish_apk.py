@@ -71,7 +71,9 @@ def main():
         sys.exit('That file has no app code in it: it does not look like an APK.')
     if version.encode('utf-16-le') not in manifest:
         sys.exit(f'The APK\'s own version number is not {version}. Check versionName in build.gradle, rebuild, and try again.')
-    if page_script is None:
+    if 'assets/products.json' in names:
+        pass  # the native Android app: it checks for updates itself, using its own versionName
+    elif page_script is None:
         print('WARNING: this APK does not contain the Update button (assets/js/app-update.js). '
               'Phones that install it will not be able to update themselves.')
     else:
