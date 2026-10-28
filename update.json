@@ -1,7 +1,7 @@
 {
-  "latest_version": "3.0.1",
+  "latest_version": "3.0.2",
   "apk_url": "https://raw.githubusercontent.com/johniikuttann/naturia-server/main/apk/Naturia.apk",
-  "notes": "Security update: a changed password now ends old sign-ins, plus tighter protection against guessing.",
-  "sha256": "7de3d46ba970d6bfcb4f07c83aada8bbb6abd0ab2106b0f1f30fc418f1262e39",
-  "size_bytes": 8639994
+  "notes": "The Update button now opens the download page; the app no longer installs files by itself.",
+  "sha256": "6ccd625519763cf3bfc0a3de5c662d4cd23730c95cb34f1a807334c897d3a388",
+  "size_bytes": 8639530
 }
